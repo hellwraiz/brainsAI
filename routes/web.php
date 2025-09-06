@@ -21,3 +21,5 @@ Route::get('/about', function () {
 Route::get('/contact', function () {
     return view('welcome');
 });
+
+Route::apiResource('mains', App\Http\Controllers\MainController::class);

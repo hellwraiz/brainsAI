@@ -7,6 +7,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <div id="app"></div>
+    <div style="width: 100%; height: 100vh;" id="app"></div>
 </body>
 </html>
