@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Main;
+use App\Models\Content;
 use Illuminate\Http\Request;
 
-class MainController extends Controller
+class ShortController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        
-
-        return response()->json(Main::all());
+        return response()->json(Content::where('type', 'short')->orderBy('order')->get());
     }
 
     /**
@@ -28,20 +26,15 @@ class MainController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Main $main)
+    public function show(Content $short)
     {
-        $main->transform(function ($main) {
-            $main->video_url = '/storage/videos/' . $main->background_video;
-            return $main;
-        });
-
-        return response()->json($main);
+        return response()->json($short);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Main $main)
+    public function update(Request $request, Content $short)
     {
         //
     }
@@ -49,7 +42,7 @@ class MainController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Main $main)
+    public function destroy(Content $short)
     {
         //
     }

@@ -22,4 +22,9 @@ Route::get('/contact', function () {
     return view('welcome');
 });
 
-Route::apiResource('mains', App\Http\Controllers\MainController::class);
+Route::apiResource('videos', App\Http\Controllers\VideoController::class);
+Route::apiResource('shorts', App\Http\Controllers\ShortController::class);
+Route::apiResource('scrollImages', App\Http\Controllers\ImageController::class);
+Route::get('/test-images', function() {
+    return response()->json(['test' => 'working']);
+});

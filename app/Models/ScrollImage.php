@@ -5,10 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class main extends Model
+class ScrollImage extends Model
 {
     
     use HasFactory;
-
-    protected $fillable = ['title', 'description', 'background_video'];
+    protected $fillable = ['img_url', 'order'];
 }

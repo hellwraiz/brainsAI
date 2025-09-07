@@ -1,7 +1,10 @@
 *
 !.gitignore
-!backgrounds
-!/backgrounds/background1.mp4
-!/backgrounds/background2.mp4
+!content
+!content/sample_videos
+!/content/sample_videos/background1.mp4
+!/content/sample_videos/background2.mp4
 !aboutScroll
-!/aboutScroll/placeholder.webp
+!/aboutScroll/sample_images
+!/aboutScroll/sample_images/*
+!/aboutScroll/placeholder.jpg

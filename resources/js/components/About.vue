@@ -1,25 +1,30 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref, inject } from 'vue';
 
+const content = inject('content');
 
-const images = []
+const images = computed (() => content.images.length ? content.images.map(img => img.img_url) : ['/storage/aboutScroll/placeholder.jpg']);
 
-if (images.length === 0) {
-    console.warn('No images found for scrolling effect.');
-    images.push('/images/aboutScroll/placeholder.webp');
-}
+console.log("Content in About.vue", content);
+console.log("Images in About.vue", images.value);
 
-
-const duplicatedImages = ref([...images, ...images, ...images, ...images])
-while (duplicatedImages.value.length < 20) {
-    duplicatedImages.value = [...duplicatedImages.value, ...duplicatedImages.value];
-}
+const duplicatedImages = computed (() => {
+    let result = [...images.value, ...images.value, ...images.value, ...images.value];
+    
+    while (result.length < 20) {
+        result = [...result, ...result];
+    }
+    
+    return result;
+})
 
 const halfwayPoint = - (duplicatedImages.value.length / 2) * 191;
 
+const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
+
 </script>
 
-<style>
+<style scoped>
 
 .about {
         justify-items: center;
@@ -64,7 +69,7 @@ ul li {
 }
 
 .scrolling-content {
-  animation: scroll-left 20s linear infinite;
+  animation: scroll-left var(--time-per-loop) linear infinite;
 }
 
 .scrolling-content img {
@@ -111,7 +116,7 @@ ul li {
     </div>
 
     <div class="scrolling-container"
-    :style="{ '--halfway-point': halfwayPoint + 'px' }">
+    :style="{ '--halfway-point': halfwayPoint + 'px', '--time-per-loop': timePerLoop + 's' }">
         <div class="scrolling-content">
             <img 
             v-for="(img, index) in duplicatedImages" 

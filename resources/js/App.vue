@@ -6,30 +6,35 @@
     
     const screenWidth = ref(0);
     
-    const videos = reactive({
-        mains: [],
-        work: [],
+    const content = reactive({
+        videos: [],
         shorts: [],
+        images: []
     });
 
-    async function fetchVideos(type) {
+    async function fetchVideos() {
         try {
-            const res = await axios.get(`/${type}`)
-            videos[type] = res.data
+            let res = await axios.get(`/videos`)
+            content.videos = res.data;
+            console.log("Fetched videos", res.data)
+            res = await axios.get(`/shorts`)
+            content.shorts = res.data;
+            console.log("Fetched shorts", res.data)
+            res = await axios.get(`/scrollImages`)
+            content.images = res.data;
+            console.log("Fetched images", res.data)
         } catch (e) {
-            console.error(`Failed to load ${type}`, e)
+            console.error(`Failed to load videos`, e)
         }
     }
 
     onMounted(async () => {
-        await Promise.all([
-            fetchVideos('mains')
-        ])
+        fetchVideos()
         updateWidth()
         window.addEventListener('resize', updateWidth)
     });
 
-    provide('videos', videos);
+    provide('content', content);
 
 
     function updateWidth() {

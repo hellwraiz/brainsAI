@@ -1,22 +1,12 @@
 <script setup>
-import { ref, inject, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
 const isHovered = ref(false);
-const isActive = ref(false);
-const videos = inject('videos');
 const index = ref(0);
 
-const length = computed(() => videos?.mains?.length || 0);
-const main = computed(() => videos?.mains?.[index.value] || null);
-const backgroundVideo = computed(() => '/storage/backgrounds/' + (main?.value?.background_video || null));
-
-
-watch(() => videos.mains.length, (newLength) => {
-  if (newLength === 0) {
-    console.warn('No main videos available. Using default background video.');
-  } else {
-    console.log('Main videos loaded:', newLength);
-  }
-})
+const content = inject('content');
+const length = computed(() => content.videos.length);
+const video = computed(() => length ? content.videos[index.value] : null);
+const backgroundVideo = computed(() => video ? video?.value?.content_url : null);
 
 function handleScroll(event) {
   event.preventDefault()
@@ -30,7 +20,6 @@ function handleScroll(event) {
 
 onMounted(() => {
     window.addEventListener('wheel', handleScroll, {passive: false});
-    console.log(videos)
 });
 
 onUnmounted(() => {
@@ -91,23 +80,22 @@ button {
 </style>
 
 <template>
-  <div v-if="videos?.mains?.length > 0">
+  <div v-if="length > 0">
     <div class="background-video">
       <video :key="backgroundVideo" :src="backgroundVideo" autoplay muted loop playsinline style="width: 100%; height:10 0%; object-fit: cover;" ></video>
     </div>
     <div class="videoElements">
       <div>
-        <h1>{{ main.title }}</h1>
-        <h2>{{ main.description }}</h2>
+        <h1>{{ video.title }}</h1>
+        <h2>{{ video.description }}</h2>
         <button>
           <img :src="isHovered ? '/images/watch hover.png' : '/images/watch.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
         </button>
       </div>
       <div class="listIndicators">
-        <img v-for="(_, itemIndex) in videos.mains" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
+        <img v-for="itemIndex in length" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
       </div>
     </div>
   </div>
-  <div style="background-color: black;" v-else>
-  </div>
+  <div style="background-color: black;" v-else />
 </template>
