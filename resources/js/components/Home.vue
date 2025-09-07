@@ -39,7 +39,7 @@ onUnmounted(() => {
 
 </script>
 
-<style>
+<style scoped>
 .background-video {
     position: fixed;
     top: 0;
@@ -88,10 +88,6 @@ button {
   gap: 10px;
 }
 
-.listIndicators img {
-  object-fit: contain;
-}
-
 </style>
 
 <template>
@@ -111,5 +107,7 @@ button {
         <img v-for="(_, itemIndex) in videos.mains" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
       </div>
     </div>
+  </div>
+  <div style="background-color: black;" v-else>
   </div>
 </template>

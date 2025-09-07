@@ -45,7 +45,7 @@
 
 </script>
 
-<style>
+<style scoped>
     header {
         align-self: center;
         display: flex;
