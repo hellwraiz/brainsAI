@@ -6,7 +6,7 @@ const isHovered = ref(false);
 
 const content = inject('content');
 //const videos = computed(() => content.videos);
-const videos = computed (() => [...content.videos, ...content.videos, ...content.videos, content.videos[0]]);
+const videos = computed (() => content.videos);
 
 </script>
 
@@ -57,7 +57,7 @@ button {
                     :src="video.content_url"
                     width="704px"
                     :class="index % 2 === 1 ? 'shifted' : ''"
-                    style="aspect-ratio: 16/9;"
+                    style="aspect-ratio: 16/9; object-fit: cover;"
                 ></video>
             </div>
             <button :class="videos.length % 2 == 1 ? 'shifted' : ''">
