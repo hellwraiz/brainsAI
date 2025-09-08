@@ -16,6 +16,8 @@ function handleScroll(event) {
   } else if (event.deltaY < 0) {
     index.value = (index.value - 1 + length.value) % length.value;
   }
+
+  console.log("Scrolled to index:", index.value);
 }
 
 onMounted(() => {
@@ -52,13 +54,15 @@ onUnmounted(() => {
 }
 
 h1 {
-  font-size: 4em;
+  font-size: 3.6em;
   font-weight: 600;
   margin: 0;
+  width: 40%;
 }
 
 h2 {
   margin: 10px 0 30px;
+  width: 40%;
 }
 
 button {
@@ -75,6 +79,7 @@ button {
   display: flex;
   flex-direction: row;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 </style>
@@ -93,7 +98,7 @@ button {
         </button>
       </div>
       <div class="listIndicators">
-        <img v-for="itemIndex in length" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
+        <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
       </div>
     </div>
   </div>
