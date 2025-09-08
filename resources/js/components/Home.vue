@@ -100,5 +100,4 @@ button {
       </div>
     </div>
   </div>
-  <div style="background-color: black;" v-else />
 </template>

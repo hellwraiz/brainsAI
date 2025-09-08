@@ -5,20 +5,11 @@ import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
 const isHovered = ref(false);
 
 const content = inject('content');
-//const videos = computed(() => content.videos);
 const videos = computed (() => content.videos);
 
 </script>
 
 <style scoped>
-
-.container {
-    justify-items: center;
-    margin: auto;
-    padding: 0px 50px 50px;
-    max-width: 1540px;
-}
-    
 .videoGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -53,12 +44,7 @@ button {
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div v-for="(video, index) in videos" :key="index">
-                <video 
-                    :src="video.content_url"
-                    width="704px"
-                    :class="index % 2 === 1 ? 'shifted' : ''"
-                    style="aspect-ratio: 16/9; object-fit: cover;"
-                ></video>
+                <video :src="video.content_url" width="704px" :class="index % 2 === 1 ? 'shifted' : ''" style="aspect-ratio: 16/9; object-fit: cover;"></video>
             </div>
             <button :class="videos.length % 2 == 1 ? 'shifted' : ''">
             <img :src="isHovered ? '/images/contactUsHover.png' : '/images/contactUs.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />

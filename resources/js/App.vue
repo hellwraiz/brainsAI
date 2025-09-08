@@ -47,32 +47,40 @@
 
 </script>
 
-<style scoped>
-    header {
-        align-self: center;
-        display: flex;
-        flex-grow: 1;
-        justify-content: space-between;
-        margin: auto;
-        padding: 50px 50px 0px;
-        max-width: 1540px;
-    }
-    .logo {
-        width: 257px;
-    }
-    header nav {
-        display: flex;
-        gap: 50px;
-        font-weight: 500;
-        font-size: 18px;
-    }
+<style>
+header {
+    align-self: center;
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-between;
+    margin: auto;
+    padding: 50px 50px 0px;
+    max-width: 1540px;
+}
+.logo {
+    width: 257px;
+}
+header nav {
+    display: flex;
+    gap: 50px;
+    font-weight: 500;
+    font-size: 18px;
+}
 
-    .video-background {
+.video-background {
     position: relative;
     width: 100%;
     height: 100vh;
     overflow: hidden;
-    }
+}
+
+
+.container {
+    justify-items: center;
+    margin: auto;
+    padding: 0px 50px 50px;
+    max-width: 1540px;
+}
 </style>
 
 <template>

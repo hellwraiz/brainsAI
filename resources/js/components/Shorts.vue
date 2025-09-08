@@ -5,7 +5,6 @@ import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
 const isHovered = ref(false);
 
 const content = inject('content');
-//const videos = computed(() => content.videos);
 const videos = computed (() => content.shorts);
 
 const getColumnClass = (index) => {
@@ -18,13 +17,6 @@ const getColumnClass = (index) => {
 </script>
 
 <style scoped>
-
-.container {
-    justify-items: center;
-    margin: auto;
-    padding: 0px 50px 50px;
-    max-width: 1540px;
-}
     
 .videoGrid {
     display: grid;
@@ -57,12 +49,7 @@ const getColumnClass = (index) => {
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div v-for="(video, index) in videos" :key="index">
-                <video 
-                    :src="video.content_url"
-                    width="460px"
-                    :class="getColumnClass(index)"
-                    style="aspect-ratio: 9/16; object-fit: cover;"
-                ></video>
+                <video :src="video.content_url" width="460px" :class="getColumnClass(index)" style="aspect-ratio: 9/16; object-fit: cover;"></video>
             </div>
         </div>
         <div style="display: flex; justify-content: center;">

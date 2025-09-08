@@ -26,15 +26,7 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
 
 <style scoped>
 
-.about {
-        justify-items: center;
-        margin: auto;
-        padding: 0px 50px 50px;
-        max-width: 1540px;
-    }
-
-
-.about > h1 {
+.container > h1 {
   font-size: 2.4em;
   font-weight: 900;
   margin: 50px 0 30px;
@@ -42,7 +34,7 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
   line-height: 1em;
 }
 
-.about > div {
+.container > div {
     display: flex;
     width: 80%;
     padding-top: 20px;
@@ -98,7 +90,7 @@ ul li {
 <template>
     <div>
 
-    <div class="about" >
+    <div class="container" >
         <h1>CREATIVITY WITHOUT BORDERS. CONTENT THAT CAPTIVATES, INSPIRES, AND REFUSES TO BE IGNORED.</h1>
         <div>
             <p style="flex: 2;" >
