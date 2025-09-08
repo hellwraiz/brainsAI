@@ -16,13 +16,10 @@
         try {
             let res = await axios.get(`/videos`)
             content.videos = res.data;
-            console.log("Fetched videos", res.data)
             res = await axios.get(`/shortss`)
             content.shorts = res.data;
-            console.log("Fetched shorts", res.data)
             res = await axios.get(`/scrollImages`)
             content.images = res.data;
-            console.log("Fetched images", res.data)
         } catch (e) {
             console.error(`Failed to load videos`, e)
         }

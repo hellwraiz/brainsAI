@@ -16,8 +16,6 @@ function handleScroll(event) {
   } else if (event.deltaY < 0) {
     index.value = (index.value - 1 + length.value) % length.value;
   }
-
-  console.log("Scrolled to index:", index.value);
 }
 
 onMounted(() => {
