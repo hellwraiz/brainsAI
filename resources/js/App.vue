@@ -16,7 +16,7 @@
         try {
             let res = await axios.get(`/videos`)
             content.videos = res.data;
-            res = await axios.get(`/shortss`)
+            res = await axios.get(`/reels`)
             content.shorts = res.data;
             res = await axios.get(`/scrollImages`)
             content.images = res.data;

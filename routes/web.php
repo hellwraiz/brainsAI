@@ -14,8 +14,5 @@ Route::get('/admin', function () {return view('welcome');});
 
 
 Route::apiResource('videos', App\Http\Controllers\VideoController::class);
-Route::apiResource('shortss', App\Http\Controllers\ShortController::class);
+Route::apiResource('reels', App\Http\Controllers\ShortController::class);
 Route::apiResource('scrollImages', App\Http\Controllers\ImageController::class);
-Route::get('/test-images', function() {
-    return response()->json(['test' => 'working']);
-});

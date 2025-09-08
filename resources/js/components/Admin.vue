@@ -7,21 +7,52 @@ import axios from 'axios'
 
 
 const content = inject('content');
-const videos = computed (() => content.videos);
-const shorts = computed (() => content.shorts);
 const images = computed (() => content.images);
+console.log(content)
 
 const router = useRouter()
 const user = ref(null)
-const activeTab = ref('videos')
+const activeTab = ref('video')
+
+const showEditModalVid = ref(false)
+const showEditModalImg = ref(false)
+const isCreating = ref(false)
+const editFormVid = ref({
+  id: null,
+  title: '',
+  description: '',
+  type: '',
+  order: 0,
+  file: null
+})
+const editFormImg = ref({
+  id: null,
+  order: 0,
+  file: null
+})
 
 const tabs = [
-  { id: 'videos', label: 'Videos' },
-  { id: 'shorts', label: 'Shorts' },
-  { id: 'images', label: 'Scroll Images' }
+  { id: 'video', label: 'Video' },
+  { id: 'short', label: 'Short' },
+  { id: 'image', label: 'Scroll Image' }
 ]
 
-console.log("Content in Admin.vue", content);
+function fetchVideos() {
+  axios.get('/videos').then(response => {
+    content.videos = response.data
+    console.log(content.videos)
+  })
+  axios.get('/reels').then(response => {
+    content.shorts = response.data
+    console.log(content.shorts)
+  })
+}
+
+function fetchImages() {
+  axios.get('/scrollImages').then(response => {
+    content.images = response.data
+  })
+}
 
 const logout = async () => {
   try {
@@ -30,18 +61,6 @@ const logout = async () => {
   } catch (error) {
     console.error('Logout failed:', error)
   }
-}
-
-function createContent() {
-  alert(`Create new content in ${activeTab.value} tab`)
-}
-
-function editContent(id) {
-  alert(`Edit content with ID: ${id} in ${activeTab.value} tab`)
-}
-
-function deleteContent(id) {
-  alert(`Delete content with ID: ${id} in ${activeTab.value} tab`)
 }
 
 onMounted(async () => {
@@ -53,27 +72,265 @@ onMounted(async () => {
   }
 })
 
-const editVideo = (video) => {
-  console.log('Edit video:', video)
-  // We'll implement this later with a popup
+const changeOrder = async (image, direction) => {
+  console.log(`Change order of image ID ${image.id} to the ${direction}`)
 }
 
-const deleteVideo = async (videoId) => {
+const createContent = () => {
+  console.log(activeTab.value)
+  if (activeTab.value === 'video' || activeTab.value === 'short') {
+    editFormVid.value = { id: null, title: '', description: '', type: activeTab, order: content[activeTab.value + 's'].length, file: null }
+    showEditModalVid.value = true
+  } else {
+    editFormImg.value = { id: null, order: content.images.length, file: null }
+    showEditModalImg.value = true
+  }
+  isCreating.value = true
+}
+
+const editContent = (content) => {
+  if (activeTab.value === 'video' || activeTab.value === 'short') {
+    editFormVid.value = {
+      id: content.id,
+      title: content.title,
+      description: content.description,
+      type: content.type,
+      order: content.order,
+      file: null
+    }
+    showEditModalVid.value = true
+  } else {
+    editFormImg.value = {
+      id: content.id,
+      order: content.order,
+      file: null
+    }
+    showEditModalImg.value = true
+  }
+  isCreating.value = false
+}
+
+const closeModal = () => {
+  showEditModalVid.value = false
+  showEditModalImg.value = false
+  isCreating.value = false
+  editFormVid.value = { id: null, title: '', description: '', type: '', order: 0, file: null }
+  editFormImg.value = { id: null, order: 0, file: null }
+}
+
+const handleFileChange = (event) => {
+  if (activeTab.value === 'video' || activeTab.value === 'short') {
+    editFormVid.value.file = event.target.files[0]
+  } else {
+    editFormImg.value.file = event.target.files[0]
+  }
+}
+
+const updateVideo = async () => {
+  try {
+    const formData = new FormData()
+    formData.append('title', editFormVid.value.title)
+    formData.append('description', editFormVid.value.description)
+    formData.append('type', editFormVid.value.type)
+    if (editFormVid.value.file) {
+      formData.append('video_file', editFormVid.value.file)
+    }
+    formData.append('order', editFormVid.value.order)
+
+    
+    if (isCreating.value) {
+      if (editFormVid.value.type === 'video') {
+        await axios.post('/videos', formData, {
+          headers: { 'Content-Type': 'multipart/form-data'}
+        })
+      } else {
+          await axios.post('/reels', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          })
+      }
+    } else {
+      if (editFormVid.value.type === 'video') {
+        await axios.post(`/videos/${editFormVid.value.id}?_method=PATCH`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data'}
+        })
+      } else {
+          await axios.post(`/reels/${editFormVid.value.id}?_method=PATCH`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          })
+      }
+    }
+    closeModal()
+    fetchVideos()
+  } catch (error) {
+    console.error('Update failed:', error)
+  }
+}
+
+const updateImage = async () => {
+
+  try {
+    const formData = new FormData()
+    if (editFormImg.value.file) {
+      formData.append('video_file', editFormImg.value.file)
+    }
+    formData.append('order', editFormImg.value.order)
+
+    
+    if (isCreating.value) {
+      await axios.post('/reels', formData, {
+        headers: { 'Content-Type': 'multipart/form-data'}
+      })
+    } else {
+      await axios.post(`/reels/${editFormImg.value.id}?_method=PATCH`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data'}
+      })
+    }
+    closeModal()
+    fetchImages()
+  } catch (error) {
+    console.error('Update failed:', error)
+  }
+}
+
+const deleteContent = async (ContentId) => {
   if (confirm('Are you sure you want to delete this video?')) {
     try {
-      await axios.delete(`/videos/${videoId}`)
-      videos.value = videos.value.filter(v => v.id !== videoId)
+      if (activeTab.value === 'video') {
+        await axios.delete(`/videos/${ContentId}`)
+      } else if (activeTab.value === 'short') {
+        await axios.delete(`/reels/${ContentId}`)
+      } else {
+        await axios.delete(`/scrollImages/${ContentId}`)
+      }
+      fetchVideos()
+      fetchImages()
     } catch (error) {
       console.error('Delete failed:', error)
     }
   }
 }
-
-const changeOrder = async (image, direction) => {
-  console.log(`Change order of image ID ${image.id} to the ${direction}`)
-}
-
 </script>
+
+
+
+<template>
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    <!-- Navigation tabs -->
+    <nav class="admin-nav">
+      <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id" :class="{ active: activeTab === tab.id }">
+        {{ tab.label }}
+      </button>
+      <button @click="logout" class="logout-btn">Logout</button>
+    </nav>
+
+    <main class="admin-content">
+
+      <!-- Displaying videos and shorts-->
+      <div class="video-list" v-if="activeTab === 'video' || activeTab === 'short'" >
+        <div class="content-item" v-for="video in content[activeTab + 's']" :key="video.id">
+            
+          <video style="height: 150px; object-fit: cover;" :style="[ activeTab === 'video' ? 'aspect-ratio: 16/9' : 'aspect-ratio: 9/16']" :src="video.content_url" controls></video>
+
+          <div class="self-start flex flex-col gap-2">
+            <h2>{{ video.title }}</h2>
+            <p class="text-[#666]" >{{ video.description }}</p>
+          </div>
+          
+          <div class="ml-auto flex-col flex gap-2 align-center justify-center">
+            <button @click="changeOrder(video, 'l')">
+              <img src="/public/images/arrowU.png" class="arrow-btn" alt="up">
+            </button>
+            <button @click="changeOrder(video, 'r')">
+              <img src="/public/images/arrowD.png" class="arrow-btn" alt="down">
+            </button>
+          </div>
+          <button @click="editContent(video)" class=" bg-[#007bff] text-white btn">Edit</button>
+          <button @click="deleteContent(video.id)" class="bg-[#dc3545] text-white btn">Delete</button>
+          
+        </div>
+      </div>
+      
+
+
+      <!-- Displaying images-->
+      <div class="image-list" v-if="activeTab === 'image'">
+        <div class="content-item flex-col" v-for="image in images" :key="image.id">
+          <img :src="image.img_url"/>
+          <div class="flex justify-around w-full">
+            <button @click="changeOrder(image, 'l')">
+              <img src="/public/images/arrowL.png" class="arrow-btn" alt="left">
+            </button>
+            <button @click="changeOrder(image, 'r')">
+              <img src="/public/images/arrowR.png" class="arrow-btn" alt="right">
+            </button>
+          </div>
+          <div class="flex gap-2 justify-center">
+            <button @click="editContent(image)" class="bg-[#007bff] text-white btn">Edit</button>
+            <button @click="deleteContent(image.id)" class="bg-[#dc3545] text-white btn">Delete</button>
+          </div>
+        </div>
+      </div>
+      <button @click="createContent">Create new entry</button>
+    </main>
+  </div>
+
+
+  <!-- ------------------------------------------ Edit Modal (for video) ---------------------------------------- -->
+  <div v-if="showEditModalVid" class="modal-overlay" @click="closeModal">
+    <div class="modal" @click.stop>
+      <h2 v-if="isCreating">Add video</h2>
+      <h2 v-else>Change video info</h2>
+      <form @submit.prevent="updateVideo">
+        <div>
+          <label>Title:</label>
+          <input v-model="editFormVid.title" type="text" required />
+        </div>
+        
+        <div>
+          <label>Description:</label>
+          <textarea v-model="editFormVid.description" required></textarea>
+        </div>
+        
+        <div>
+          <label v-if="isCreating">Video to upload:</label>
+          <label v-else>Change video(optional):</label>
+          <input @change="handleFileChange" type="file" accept="video/*" />
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" @click="closeModal">Cancel</button>
+          <button v-if="isCreating" type="submit">Add video</button>
+          <button v-else type="submit">Update video</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ------------------------------------------ Edit Modal (for image) ---------------------------------------- -->
+  <div v-if="showEditModalImg" class="modal-overlay" @click="closeModal">
+    <div class="modal" @click.stop>
+      <h2 v-if="isCreating">Add image</h2>
+      <h2 v-else>Change image info</h2>
+      <form @submit.prevent="updateImage">
+        
+        <div>
+          <label v-if="isCreating">Image to upload:</label>
+          <label v-else>Change image(optional):</label>
+          <input @change="handleFileChange" type="file" accept="image/*" />
+        </div>
+        
+        <div class="modal-actions">
+          <button type="button" @click="closeModal">Cancel</button>
+          <button v-if="isCreating" type="submit">Add image</button>
+          <button v-else type="submit">Update image info</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+</template>
 
 <style scoped>
 
@@ -175,67 +432,51 @@ h1 {
 
 
 
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal form > div {
+  margin-bottom: 15px;
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.modal input, .modal textarea, .modal select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
 </style>
-
-<template>
-  <div class="container">
-    <h1>Admin Dashboard</h1>
-    <!-- Navigation tabs -->
-    <nav class="admin-nav">
-      <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id" :class="{ active: activeTab === tab.id }">
-        {{ tab.label }}
-      </button>
-      <button @click="logout" class="logout-btn">Logout</button>
-    </nav>
-
-    <main class="admin-content">
-
-      <!-- Displaying videos and shorts-->
-      <div class="video-list" v-if="activeTab === 'videos' || activeTab === 'shorts'" >
-        <div class="content-item" v-for="video in content[activeTab]" :key="video.id">
-            
-          <video style="height: 150px; object-fit: cover;" :style="[ activeTab === 'videos' ? 'aspect-ratio: 16/9' : 'aspect-ratio: 9/16']" :src="video.content_url" controls></video>
-
-          <div class="self-start flex flex-col gap-2">
-            <h2>{{ video.title }}</h2>
-            <p class="text-[#666]" >{{ video.description }}</p>
-          </div>
-          
-          <div class="ml-auto flex-col flex gap-2 align-center justify-center">
-            <button @click="changeOrder(video, 'l')">
-              <img src="/public/images/arrowU.png" class="arrow-btn" alt="up">
-            </button>
-            <button @click="changeOrder(video, 'r')">
-              <img src="/public/images/arrowD.png" class="arrow-btn" alt="down">
-            </button>
-          </div>
-          <button @click="editVideo(video)" class=" bg-[#007bff] text-white btn">Edit</button>
-          <button @click="deleteVideo(video.id)" class="bg-[#dc3545] text-white btn">Delete</button>
-          
-        </div>
-      </div>
-      
-
-
-      <!-- Displaying images-->
-      <div class="image-list" v-if="activeTab === 'images'">
-        <div class="content-item flex-col" v-for="image in images" :key="image.id">
-          <img :src="image.img_url"/>
-          <div class="flex justify-around w-full">
-            <button @click="changeOrder(image, 'l')">
-              <img src="/public/images/arrowL.png" class="arrow-btn" alt="left">
-            </button>
-            <button @click="changeOrder(image, 'r')">
-              <img src="/public/images/arrowR.png" class="arrow-btn" alt="right">
-            </button>
-          </div>
-          <div class="flex gap-2 justify-center">
-            <button @click="editVideo(image)" class="bg-[#007bff] text-white btn">Edit</button>
-            <button @click="deleteVideo(image.id)" class="bg-[#dc3545] text-white btn">Delete</button>
-          </div>
-        </div>
-      </div>
-      <button @click="createContent" >Create new entry</button>
-    </main>
-  </div>
-</template>
