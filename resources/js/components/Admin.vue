@@ -7,8 +7,6 @@ import axios from 'axios'
 
 
 const content = inject('content');
-const images = computed (() => content.images);
-console.log(content)
 
 const router = useRouter()
 const user = ref(null)
@@ -72,8 +70,43 @@ onMounted(async () => {
   }
 })
 
-const changeOrder = async (image, direction) => {
-  console.log(`Change order of image ID ${image.id} to the ${direction}`)
+const changeOrder = async (obj, dir) => {
+  let obj1 = content[activeTab.value + 's'][obj.order + (dir === 'l' ? -1 : 1)]
+
+  if (activeTab.value === 'video' || activeTab.value === 'short') {
+    editFormVid.value = {
+      id: obj.id,
+      title: obj.title,
+      description: obj.description,
+      type: obj.type,
+      order: obj1.order,
+      file: null
+    }
+    updateVideo()
+    editFormVid.value = {
+      id: obj1.id,
+      title: obj1.title,
+      description: obj1.description,
+      type: obj1.type,
+      order: obj.order,
+      file: null
+    }
+    updateVideo()
+  } else {
+    editFormImg.value = {
+      id: obj.id,
+      order: obj1.order,
+      file: null
+    }
+    updateImage()
+    editFormImg.value = {
+      id: obj1.id,
+      order: obj.order,
+      file: null
+    }
+    updateImage()
+  }
+
 }
 
 const createContent = () => {
@@ -171,17 +204,17 @@ const updateImage = async () => {
   try {
     const formData = new FormData()
     if (editFormImg.value.file) {
-      formData.append('video_file', editFormImg.value.file)
+      formData.append('img_file', editFormImg.value.file)
     }
     formData.append('order', editFormImg.value.order)
 
     
     if (isCreating.value) {
-      await axios.post('/reels', formData, {
+      await axios.post('/scrollImages', formData, {
         headers: { 'Content-Type': 'multipart/form-data'}
       })
     } else {
-      await axios.post(`/reels/${editFormImg.value.id}?_method=PATCH`, formData, {
+      await axios.post(`/scrollImages/${editFormImg.value.id}?_method=PATCH`, formData, {
         headers: { 'Content-Type': 'multipart/form-data'}
       })
     }
@@ -238,10 +271,10 @@ const deleteContent = async (ContentId) => {
           </div>
           
           <div class="ml-auto flex-col flex gap-2 align-center justify-center">
-            <button @click="changeOrder(video, 'l')">
+            <button v-if="video.order > 0" @click="changeOrder(video, 'l')">
               <img src="/public/images/arrowU.png" class="arrow-btn" alt="up">
             </button>
-            <button @click="changeOrder(video, 'r')">
+            <button v-if="video.order < content[activeTab + 's'].length - 1" @click="changeOrder(video, 'r')">
               <img src="/public/images/arrowD.png" class="arrow-btn" alt="down">
             </button>
           </div>
@@ -255,13 +288,13 @@ const deleteContent = async (ContentId) => {
 
       <!-- Displaying images-->
       <div class="image-list" v-if="activeTab === 'image'">
-        <div class="content-item flex-col" v-for="image in images" :key="image.id">
-          <img :src="image.img_url"/>
+        <div class="content-item flex-col" v-for="image in content.images" :key="image.id">
+          <img style="width: 161px; height: 207px; object-fit: cover;" :src="image.img_url"/>
           <div class="flex justify-around w-full">
-            <button @click="changeOrder(image, 'l')">
+            <button v-if="image.order > 0" @click="changeOrder(image, 'l')">
               <img src="/public/images/arrowL.png" class="arrow-btn" alt="left">
             </button>
-            <button @click="changeOrder(image, 'r')">
+            <button v-if="image.order < content[activeTab + 's'].length - 1" @click="changeOrder(image, 'r')">
               <img src="/public/images/arrowR.png" class="arrow-btn" alt="right">
             </button>
           </div>

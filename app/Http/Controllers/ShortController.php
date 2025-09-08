@@ -6,6 +6,7 @@ use App\Models\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ShortController extends Controller
 {
@@ -22,6 +23,10 @@ class ShortController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('');
+        Log::info('check this saontehu out');
+
+        Log::info($request->all());
         // Validate the request
         $request->validate([
             'title' => 'required|string|max:255',
@@ -31,7 +36,7 @@ class ShortController extends Controller
             'order' => 'required|integer'
         ]);
         
-        $filePath = $request->file('video_file')->store('videos', 'public');
+        $filePath = $request->file('video_file')->store('content', 'public');
         $contentUrl = '/storage/' . $filePath;
         
         // Create the video record
@@ -76,7 +81,7 @@ class ShortController extends Controller
             Storage::delete($oldFilePath);
             
             // Store new file
-            $filePath = $request->file('video_file')->store('videos', 'public');
+            $filePath = $request->file('video_file')->store('content', 'public');
             $reel->content_url = '/storage/' . $filePath;
         }
         

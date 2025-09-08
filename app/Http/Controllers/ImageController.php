@@ -6,6 +6,7 @@ use App\Models\ScrollImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ImageController extends Controller
 {
@@ -23,22 +24,28 @@ class ImageController extends Controller
     public function store(Request $request)
     {
         Log::info('');
+        Log::info('check this saontehu out');
+
+        Log::info($request->all());
         // Validate the request
         $request->validate([
             'img_file' => 'required|required|file|mimes:jpg,jpeg,png,webp,gif|max:51200', // 50MB max
             'order' => 'required|integer'
         ]);
+
+
+        Log::info('this stinks');
         
-        $filePath = $request->file('video_file')->store('videos', 'public');
+        $filePath = $request->file('img_file')->store('aboutScroll', 'public');
         $contentUrl = '/storage/' . $filePath;
         
         // Create the video record
-        $video = ScrollImage::create([
+        $scrollImage = ScrollImage::create([
             'img_url' => $contentUrl,
             'order' => $request->order
         ]);
         
-        return response()->json($video, 201);
+        return response()->json($scrollImage, 201);
     }
 
     /**
@@ -54,7 +61,6 @@ class ImageController extends Controller
      */
     public function update(Request $request, ScrollImage $scrollImage)
     {
-        
         // Validate the request
         $request->validate([
             'img_file' => 'sometimes|required|file|mimes:jpg,jpeg,png,webp,gif|max:51200',
@@ -68,7 +74,7 @@ class ImageController extends Controller
             Storage::delete($oldFilePath);
             
             // Store new file
-            $filePath = $request->file('video_file')->store('videos', 'public');
+            $filePath = $request->file('img_file')->store('aboutScroll', 'public');
             $scrollImage->content_url = '/storage/' . $filePath;
         }
         
@@ -84,15 +90,21 @@ class ImageController extends Controller
      */
     public function destroy(ScrollImage $scrollImage)
     {
+        Log::info('');
+        Log::info('killll');
+        Log::info('');
+
+        Log::info('scrollImage order value: ' . var_export($scrollImage->order, true));
+        Log::info('scrollImage order type: ' . gettype($scrollImage->order));
         $deletedOrder = $scrollImage->order;
 
-        $filePath = str_replace('storage/', 'public/', $scrollImage->content_url);
+        $filePath = str_replace('storage/', 'public/', $scrollImage->img_url);
         Storage::delete($filePath);
         $scrollImage->delete();
 
         // Reorder all items that came after the deleted item
         DB::transaction(function () use ($deletedOrder) {
-            ScrollImage::where('order', '>', $deletedOrder)->decrement('order');
+            ScrollImage::where('order', '>', $deletedOrder)->whereNotNull('order')->decrement('order');
         });
         return response()->json();
     }
