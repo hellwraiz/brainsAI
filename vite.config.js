@@ -12,4 +12,8 @@ export default defineConfig({
         tailwindcss(),
         vue(),
     ],
+    server: {
+        https: true, // Force HTTPS in development too
+        host: true,
+    },
 });

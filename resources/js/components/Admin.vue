@@ -170,6 +170,8 @@ const updateVideo = async () => {
     }
     formData.append('order', editFormVid.value.order)
 
+    closeModal()
+
     
     if (isCreating.value) {
       if (editFormVid.value.type === 'video') {
@@ -192,7 +194,6 @@ const updateVideo = async () => {
           })
       }
     }
-    closeModal()
     fetchVideos()
   } catch (error) {
     console.error('Update failed:', error)
@@ -208,6 +209,8 @@ const updateImage = async () => {
     }
     formData.append('order', editFormImg.value.order)
 
+    closeModal()
+
     
     if (isCreating.value) {
       await axios.post('/scrollImages', formData, {
@@ -218,7 +221,6 @@ const updateImage = async () => {
         headers: { 'Content-Type': 'multipart/form-data'}
       })
     }
-    closeModal()
     fetchImages()
   } catch (error) {
     console.error('Update failed:', error)
