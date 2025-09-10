@@ -47,6 +47,22 @@
 
 </script>
 
+<template>
+    <header>
+        <router-link class="logo" to="/">
+            <img class="logo" :src="isHome ? '/images/logow.png' : '/images/logob.png'" alt="Logo" />
+        </router-link>
+        <nav :class="[isHome ? 'text-white' : 'text-black']">
+            <router-link to="/work">Work</router-link>
+            <router-link to="/shorts">Shorts</router-link>
+            <router-link to="/about">About</router-link>
+            <router-link to="/contact">Contact</router-link>
+        </nav>
+    </header>
+
+    <router-view></router-view>
+</template>
+
 <style>
 header {
     align-self: center;
@@ -82,19 +98,3 @@ header nav {
     max-width: 1540px;
 }
 </style>
-
-<template>
-    <header>
-        <router-link class="logo" to="/">
-            <img class="logo" :src="isHome ? '/images/logow.png' : '/images/logob.png'" alt="Logo" />
-        </router-link>
-        <nav :class="[isHome ? 'text-white' : 'text-black']">
-            <router-link to="/work">Work</router-link>
-            <router-link to="/shorts">Shorts</router-link>
-            <router-link to="/about">About</router-link>
-            <router-link to="/contact">Contact</router-link>
-        </nav>
-    </header>
-
-    <router-view></router-view>
-</template>

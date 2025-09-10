@@ -1,5 +1,6 @@
 <script setup>
 import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
+import VideoModal from './VideoModal.vue';
 const isHovered = ref(false);
 const index = ref(0);
 
@@ -7,6 +8,7 @@ const content = inject('content');
 const length = computed(() => content.videos.length);
 const video = computed(() => length ? content.videos[index.value] : null);
 const backgroundVideo = computed(() => video ? video?.value?.content_url : null);
+const selectedVideo = ref(null);
 
 function handleScroll(event) {
   event.preventDefault()
@@ -27,6 +29,29 @@ onUnmounted(() => {
 });
 
 </script>
+
+<template>
+  <div v-if="length > 0">
+    <div class="background-video">
+      <video :key="backgroundVideo" :src="backgroundVideo" autoplay muted loop playsinline style="width: 100%; height:10 0%; object-fit: cover;" ></video>
+    </div>
+    <div class="videoElements">
+      <div>
+        <h1>{{ video.title }}</h1>
+        <h2>{{ video.description }}</h2>
+        <button @click="selectedVideo = video">
+          <img :src="isHovered ? '/images/watch hover.png' : '/images/watch.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
+        </button>
+      </div>
+      <div class="listIndicators">
+        <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
+      </div>
+    </div>
+  </div>
+
+  <VideoModal v-model="selectedVideo"/>
+
+</template>
 
 <style scoped>
 .background-video {
@@ -81,23 +106,3 @@ button {
 }
 
 </style>
-
-<template>
-  <div v-if="length > 0">
-    <div class="background-video">
-      <video :key="backgroundVideo" :src="backgroundVideo" autoplay muted loop playsinline style="width: 100%; height:10 0%; object-fit: cover;" ></video>
-    </div>
-    <div class="videoElements">
-      <div>
-        <h1>{{ video.title }}</h1>
-        <h2>{{ video.description }}</h2>
-        <button>
-          <img :src="isHovered ? '/images/watch hover.png' : '/images/watch.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
-        </button>
-      </div>
-      <div class="listIndicators">
-        <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
-      </div>
-    </div>
-  </div>
-</template>

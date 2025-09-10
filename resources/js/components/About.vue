@@ -24,6 +24,39 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
 
 </script>
 
+<template>
+    <div>
+
+    <div class="container" >
+        <h1>CREATIVITY WITHOUT BORDERS. CONTENT THAT CAPTIVATES, INSPIRES, AND REFUSES TO BE IGNORED.</h1>
+        <div>
+            <p style="flex: 2;" >
+                <strong>Welcome to Mozgi AI </strong>- the creative playground where ideas have no limits. We produce commercials, reels, music videos, animated shorts, and films powered by AI and human ingenuity. Our collective of bold minds is driven by one mission: to make content that captivates, inspires, and leaves a mark.
+            </p>
+            <div style="flex: 1;">With us, you get:<br>
+                <ul>
+                    <li>Any format, any platform</li>
+                    <li>Speed that matches your ambition</li>
+                    <li>Freedom from traditional barriers</li>
+                </ul>
+            </div>
+            <p style="flex: 1;"><strong>Mozgi AI:</strong> Turning imagination into impact.</p>
+        </div>
+    </div>
+
+    <div class="scrolling-container"
+    :style="{ '--halfway-point': halfwayPoint + 'px', '--time-per-loop': timePerLoop + 's' }">
+        <div class="scrolling-content">
+            <img 
+            v-for="(img, index) in duplicatedImages" 
+            :class="index % 2 === 0 ? '' : 'evenImage'"
+            :key="index"
+            :src="img" />
+        </div>
+    </div>
+    </div>
+</template>
+
 <style scoped>
 
 .container > h1 {
@@ -86,36 +119,3 @@ ul li {
 }
 
 </style>
-
-<template>
-    <div>
-
-    <div class="container" >
-        <h1>CREATIVITY WITHOUT BORDERS. CONTENT THAT CAPTIVATES, INSPIRES, AND REFUSES TO BE IGNORED.</h1>
-        <div>
-            <p style="flex: 2;" >
-                <strong>Welcome to Mozgi AI </strong>- the creative playground where ideas have no limits. We produce commercials, reels, music videos, animated shorts, and films powered by AI and human ingenuity. Our collective of bold minds is driven by one mission: to make content that captivates, inspires, and leaves a mark.
-            </p>
-            <div style="flex: 1;">With us, you get:<br>
-                <ul>
-                    <li>Any format, any platform</li>
-                    <li>Speed that matches your ambition</li>
-                    <li>Freedom from traditional barriers</li>
-                </ul>
-            </div>
-            <p style="flex: 1;"><strong>Mozgi AI:</strong> Turning imagination into impact.</p>
-        </div>
-    </div>
-
-    <div class="scrolling-container"
-    :style="{ '--halfway-point': halfwayPoint + 'px', '--time-per-loop': timePerLoop + 's' }">
-        <div class="scrolling-content">
-            <img 
-            v-for="(img, index) in duplicatedImages" 
-            :class="index % 2 === 0 ? '' : 'evenImage'"
-            :key="index"
-            :src="img" />
-        </div>
-    </div>
-    </div>
-</template>

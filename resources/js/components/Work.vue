@@ -1,13 +1,35 @@
 <script setup>
 
 import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
+import VideoModal from './VideoModal.vue';
 
 const isHovered = ref(false);
 
 const content = inject('content');
 const videos = computed (() => content.videos);
 
+const selectedVideo = ref(null);
+
 </script>
+
+<template>
+    <div class="container">
+        <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
+        <div class="videoGrid">
+            <div @click="selectedVideo = video" v-for="(video, index) in videos" :key="index">
+                <video :src="video.content_url" width="704px" :class="index % 2 === 1 ? 'shifted' : ''" style="aspect-ratio: 16/9; object-fit: cover;"></video>
+            </div>
+            <button :class="videos.length % 2 == 1 ? 'shifted' : ''">
+            <img :src="isHovered ? '/images/contactUsHover.png' : '/images/contactUs.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
+            </button>
+        </div>
+    </div>
+
+    <VideoModal v-model="selectedVideo"/>
+    
+</template>
+
+
 
 <style scoped>
 .videoGrid {
@@ -38,18 +60,3 @@ button {
 }
 
 </style>
-
-<template>
-    <div class="container">
-        <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
-        <div class="videoGrid">
-            <div v-for="(video, index) in videos" :key="index">
-                <video :src="video.content_url" width="704px" :class="index % 2 === 1 ? 'shifted' : ''" style="aspect-ratio: 16/9; object-fit: cover;"></video>
-            </div>
-            <button :class="videos.length % 2 == 1 ? 'shifted' : ''">
-            <img :src="isHovered ? '/images/contactUsHover.png' : '/images/contactUs.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
-            </button>
-        </div>
-    </div>
-    
-</template>
