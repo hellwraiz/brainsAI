@@ -27,10 +27,10 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
 <template>
     <div>
 
-    <div class="container" >
+    <div class="container pb-[150px] desktop:pb-0" >
         <h1>CREATIVITY WITHOUT BORDERS. CONTENT THAT CAPTIVATES, INSPIRES, AND REFUSES TO BE IGNORED.</h1>
         <div>
-            <p style="flex: 2;" >
+            <p style="flex: 2;">
                 <strong>Welcome to Mozgi AI </strong>- the creative playground where ideas have no limits. We produce commercials, reels, music videos, animated shorts, and films powered by AI and human ingenuity. Our collective of bold minds is driven by one mission: to make content that captivates, inspires, and leaves a mark.
             </p>
             <div style="flex: 1;">With us, you get:<br>
@@ -41,6 +41,7 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
                 </ul>
             </div>
             <p style="flex: 1;"><strong>Mozgi AI:</strong> Turning imagination into impact.</p>
+            <button><p>CONTACT US</p><img src="/public/images/arrowR.png" style="width: 30px;" alt=""></button>
         </div>
     </div>
 
@@ -60,11 +61,15 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
 <style scoped>
 
 .container > h1 {
-  font-size: 2.4em;
-  font-weight: 900;
-  margin: 50px 0 30px;
-  width: 60%;
-  line-height: 1em;
+    color: #262626;
+    font-size: 34px;
+    margin: 50px 0 30px;
+    width: 65%;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-bold);
+	letter-spacing: 0;
+	line-height: 1;
+	text-transform: uppercase;
 }
 
 .container > div {
@@ -72,6 +77,12 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
     width: 80%;
     padding-top: 20px;
     gap: 20px;
+
+    color: #262626;
+    font-size: 15px;
+	font-variation-settings: "wdth" 125;
+	line-height: 1.5;
+    opacity: 0.9;
 }
 
 ul {
@@ -109,6 +120,10 @@ ul li {
     transform: translateY(50px);
 }
 
+button {
+    display: none
+}
+
 @keyframes scroll-left {
   0% {
     transform: translateX(0);
@@ -116,6 +131,47 @@ ul li {
   100% {
     transform: translateX(var(--halfway-point));
   }
+}
+
+
+@media (max-width: 1440px) {
+
+.container {
+    padding-bottom: 150px;
+}
+
+.container > h1 {
+	font-size: 20px;
+  margin: 36px 0 30px;
+}
+
+.container > div {
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 30px;
+}
+
+button {
+	align-items: center;
+	background: #262626;
+	border-radius: 32px;
+	color: white;
+	display: flex;
+	font-size: 20px;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-bold);
+	justify-content: space-between;
+	padding: 18px 26px 18px 30px;
+	transition: all 0.3s ease;
+	width: 100%;
+}
+
+button:hover {
+    background: rgba(38, 38, 38, 0.8);
+}
+
 }
 
 </style>

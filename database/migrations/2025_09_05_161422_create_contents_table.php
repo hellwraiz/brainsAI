@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->string('content_url');
-            $table->string('type');
+            $table->string('isVideo');
+            $table->string('isLocal');
             $table->integer('order');
             $table->timestamps();
         });

@@ -15,7 +15,8 @@ class ContentSeeder extends Seeder
             'title' => 'Product One',
             'description' => 'This is the first product.',
             'content_url' => '/storage/content/sample_videos/background1.mp4',
-            'type' => 'video',
+            'isLocal' => true,
+            'isVideo' => true,
             'order' => 0
         ]);
 
@@ -23,7 +24,8 @@ class ContentSeeder extends Seeder
             'title' => 'Product Two. This one has a longer description to test the text wrapping functionality in the UI.',
             'description' => 'This is the second product. This one has a longer description to test the text wrapping functionality in the UI.',
             'content_url' => '/storage/content/sample_videos/background2.mp4',
-            'type'=> 'video',
+            'isLocal' => true,
+            'isVideo'=> true,
             'order' => 1
         ]);
 
@@ -32,7 +34,8 @@ class ContentSeeder extends Seeder
             'title' => 'Product One',
             'description' => 'This is the first product.',
             'content_url' => '/storage/content/sample_videos/background1.mp4',
-            'type' => 'short',
+            'isLocal' => true,
+            'isVideo' => false,
             'order' => 0
         ]);
 
@@ -40,7 +43,8 @@ class ContentSeeder extends Seeder
             'title' => 'Product Two. This one has a longer description to test the text wrapping functionality in the UI.',
             'description' => 'This is the second product. This one has a longer description to test the text wrapping functionality in the UI.',
             'content_url' => '/storage/content/sample_videos/background2.mp4',
-            'type'=> 'short',
+            'isLocal' => true,
+            'isVideo'=> false,
             'order' => 1
         ]);
 

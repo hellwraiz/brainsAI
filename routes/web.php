@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\VideoController;
+use App\Http\Controllers\ShortController;
+use App\Http\Controllers\ImageController;
 
 require __DIR__.'/auth.php';
 require __DIR__.'/api.php';
@@ -15,6 +17,8 @@ Route::get('/admin', function () {return view('welcome');});
 Route::get('/loginAdmin', function () {return view('welcome');});
 
 
-Route::apiResource('videos', App\Http\Controllers\VideoController::class);
-Route::apiResource('reels', App\Http\Controllers\ShortController::class);
-Route::apiResource('scrollImages', App\Http\Controllers\ImageController::class);
+Route::get('/videos/{id}/stream', [VideoController::class, 'stream']);
+Route::apiResource('videos', VideoController::class);
+Route::apiResource('reels', ShortController::class);
+Route::get('/reels/{id}/stream', [ShortController::class, 'stream']);
+Route::apiResource('scrollImages', ImageController::class);

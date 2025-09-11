@@ -129,8 +129,8 @@ const handleSubmit = async () => {
 
 <template>
 
-    <div class="h-screen flex justify-between flex-col" >
-      <div class="containerr" >
+    <div class="flex justify-between flex-col" >
+      <div class="containerr self-center" >
           <h1>TALK TO THE BRAINS BEHIND MOZGI. GOT A WILD IDEA? WE’VE GOT WILDER SOLUTIONS.</h1>
           <div class="flex gap-5">
               <!-- Social Media Icons -->
@@ -164,61 +164,64 @@ const handleSubmit = async () => {
           
       </div>
   
-      <footer class="bg-[#262626] pt-[55px] pb-[70px]">
+      <footer>
           <div>
-              <h1 class="text-white font-bold text-5xl m-0">CONTACT US</h1>
+              <h1 class="text-white font-bold text-[34px]/1 m-0">CONTACT US</h1>
               <form @submit.prevent="handleSubmit" class="">
-                  <div class="flex">
-                      <div class="flex flex-col" >
-                          <div class="flex">
-                              <div>
-                                  <label for="name" class="block text-sm font-medium mb-1">Name *</label>
+                  <div class="flex gap-[145px] justify-between items-center">
+                      <div class="flex flex-col gap-[25px] mt-auto" >
+                          <div class="flex gap-[20px]">
+                              <div class="w-[280px] mb-[33px] relative">
+                                  <label for="name" class="input-label">Name</label>
                                   <input
                                   id="name"
                                   v-model="form.name"
                                   type="text"
                                   required
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  class="input-field"
                                   :class="{ 'border-red-500': errors.name }"
+                                  placeholder="Your Name"
                                   />
                                   <span v-if="errors.name" class="text-red-500 text-sm">{{ errors.name }}</span>
                               </div>
               
-                              <div>
-                                  <label for="email" class="block text-sm font-medium mb-1">Email *</label>
+                              <div class="input-box-top">
+                                  <label for="email" class="input-label">Email</label>
                                   <input
                                   id="email"
                                   v-model="form.email"
                                   type="email"
                                   required
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  class="input-field"
                                   :class="{ 'border-red-500': errors.email }"
+                                  placeholder="Your Email"
                                   />
-                                  <span v-if="errors.email" class="text-red-500 text-sm">{{ errors.email }}</span>
+                                  <span v-if="errors.email" class="text-red text-sm">{{ errors.email }}</span>
                               </div>
               
-                              <div>
-                                  <label for="phone" class="block text-sm font-medium mb-1">Phone</label>
+                              <div class="w-[280px] mb-[33px] relative">
+                                  <label for="phone" class="input-label">Phone</label>
                                   <input
                                   id="phone"
                                   v-model="form.phone"
                                   type="tel"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  class="input-field"
                                   :class="{ 'border-red-500': errors.phone }"
+                                  placeholder="Your Phone"
                                   />
                                   <span v-if="errors.phone" class="text-red-500 text-sm">{{ errors.phone }}</span>
                               </div>
                           </div>
           
-                          <div class="flex">
-                              <div>
-                                  <label for="description" class="block text-sm font-medium mb-1">Description *</label>
+                          <div class="flex gap-[34px] items-center">
+                              <div class="w-[660px] relative">
+                                  <label for="description" class="input-label">Description</label>
                                   <textarea
                                   id="description"
                                   v-model="form.description"
                                   required
-                                  rows="4"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  rows=1
+                                  class="input-field input-field--alt max-h-[120px]"
                                   :class="{ 'border-red-500': errors.description }"
                                   placeholder="Tell us about your project..."
                                   ></textarea>
@@ -226,16 +229,15 @@ const handleSubmit = async () => {
                               </div>
               
                               <div>
-                                  <label for="files" class="block text-sm font-medium mb-1">Files (optional)</label>
                                   <input
                                   id="files"
                                   @change="handleFileChange"
                                   type="file"
                                   multiple
                                   accept="image/*,.pdf,.doc,.docx"
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  />
-                                  <p class="text-xs text-gray-500 mt-1">Max 5MB per file. Images, PDFs, and Word documents only.</p>
+                                  class="sr-only">
+                                <img class="w-[180px]" src="/public/images/send_materials.png" alt="">  
+                                </input>
                                   
                                   <!-- File List -->
                                   <div v-if="selectedFiles.length > 0" class="mt-2">
@@ -252,10 +254,9 @@ const handleSubmit = async () => {
                       <button
                       type="submit"
                       :disabled="isSubmitting"
-                      class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="w-[220px] h-[220px]"
                       >
-                      <span v-if="isSubmitting">Sending...</span>
-                      <span v-else>Send Message</span>
+                      <img src="/public/images/send_laptop.png" alt="send">
                       </button>
                   </div>
   
@@ -278,7 +279,6 @@ const handleSubmit = async () => {
     justify-items: center;
     padding: 0px 50px 50px;
     max-width: 1540px;
-    margin: 0px auto;
 }
 
 .containerr > h1 {
@@ -319,11 +319,12 @@ const handleSubmit = async () => {
 }
 
 footer {
+    position: fixed;
+    bottom: 0;
     background-color: #262626;
     padding: 55px 0px 20px;
     display: flex;
     width: 100%;
-    align-items: flex-end;
 }
 
 footer > div {
@@ -335,6 +336,42 @@ footer > div {
 footer h1 {
   font-size: 2.4em;
   font-weight: 900;
+}
+
+
+
+.input-field {
+  width: 280px;
+  background-color: white;
+  border-radius: 4px;
+  border: 2px solid rgba(#fff, .2);
+  padding: 11px 5px 12px 24px;
+  font-size: 16px;
+  letter-spacing: .3px;
+  line-height: 1.5;
+  font-variation-settings: "width" 112.5;
+}
+
+.input-field--alt {
+  width: 660px;
+}
+
+.input-box-top {
+  width: 280px;
+  margin-bottom: 33px;
+  position: relative;
+}
+
+.input-label {
+  color: #fff;
+  display: block;
+  font-size: 10px;
+  position: absolute;
+  top: -16px;
+  left: 0px;
+  text-transform: uppercase;
+  font-variation-settings: "width" 112.5;
+  font-weight: 500;
 }
 
 </style>

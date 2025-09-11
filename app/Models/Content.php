@@ -10,5 +10,5 @@ class Content extends Model
     
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'content_url', 'type', 'order'];
+    protected $fillable = ['title', 'description', 'content_url', 'isVideo', 'isLocal', 'order'];
 }

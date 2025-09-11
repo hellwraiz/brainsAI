@@ -98,8 +98,8 @@ class ImageController extends Controller
         Log::info('scrollImage order type: ' . gettype($scrollImage->order));
         $deletedOrder = $scrollImage->order;
 
-        $filePath = str_replace('storage/', 'public/', $scrollImage->img_url);
-        Storage::delete($filePath);
+        $filePath = str_replace('/storage/', '', $scrollImage->img_url);
+        Storage::disk('public')->delete($filePath);
         $scrollImage->delete();
 
         // Reorder all items that came after the deleted item

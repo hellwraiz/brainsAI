@@ -6,14 +6,17 @@ import VideoModal from './VideoModal.vue';
 const isHovered = ref(false);
 
 const content = inject('content');
+const getVideoThumbnail = inject('getVideoThumbnail')
 const videos = computed (() => content.shorts);
+
 const selectedVideo = ref(null);
 
 const getColumnClass = (index) => {
-  const column = index % 3;
-  if (column === 0) return 'shift-down-120';
-  if (column === 1) return 'shift-down-60';
-  return ''; // column 2, no shift
+    console.log(videos.value)
+    const column = index % 3;
+    if (column === 0) return 'shift-down-120';
+    if (column === 1) return 'shift-down-60';
+    return ''; // column 2, no shift
 };
 
 </script>
@@ -23,7 +26,8 @@ const getColumnClass = (index) => {
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div @click="selectedVideo = video" v-for="(video, index) in videos" :key="index">
-                <video :src="video.content_url" width="460px" :class="getColumnClass(index)" style="aspect-ratio: 9/16; object-fit: cover;"></video>
+                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" width="460px" :class="getColumnClass(index)" style="aspect-ratio: 9/16; object-fit: cover;"></video>
+                <img v-else :src="getVideoThumbnail(video.content_url)" width="460px" :class="getColumnClass(index)" style="aspect-ratio: 9/16; object-fit: cover;" alt="Video thumbnail">
             </div>
         </div>
         <div style="display: flex; justify-content: center;">
