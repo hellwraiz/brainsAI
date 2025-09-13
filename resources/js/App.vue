@@ -1,16 +1,14 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed, provide, reactive } from 'vue';
+import { ref, onMounted, onUnmounted, computed, provide, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router'
 const route = useRoute();
 const isHome = computed(() => route.path === '/');
-
-const screenWidth = ref(0);
-
 const content = reactive({
     videos: [],
     shorts: [],
     images: []
 });
+const ACTIVATETHEBURGER = ref(false)
 
 async function fetchVideos() {
     try {
@@ -27,23 +25,9 @@ async function fetchVideos() {
 
 onMounted(async () => {
     fetchVideos()
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
 });
 
 provide('content', content);
-
-
-function updateWidth() {
-screenWidth.value = window.innerWidth
-}
-
-const isLargeScreen = computed(() => screenWidth.value >= 1390)
-
-
-onUnmounted(() => {
-window.removeEventListener('resize', updateWidth)
-})
 
 // Functions for handling video thumbnails
 const getVideoThumbnail = (url) => {
@@ -85,10 +69,6 @@ const getVideoThumbnail = (url) => {
 provide('getVideoThumbnail', getVideoThumbnail);
 
 const embedUrl = (url, YtParams = {}, VmParams = {}) => {
-    console.log('Input URL:', url); // Debug log
-    console.log('params received:')
-    console.log('youtube', YtParams)
-    console.log('vimeo', VmParams)
 
     if (!url) return '';
 
@@ -112,12 +92,9 @@ const embedUrl = (url, YtParams = {}, VmParams = {}) => {
                 }
             }
         
-            console.log('Extracted YouTube ID:', id); // Debug log
-        
             if (id) {
                 let base = `https://www.youtube.com/embed/${id}`;
                 const finalUrl = withParams(base, YtParams);
-                console.log('Final embed URL:', finalUrl); // Debug log
                 return finalUrl;
             }
         } catch (error) {
@@ -130,12 +107,10 @@ const embedUrl = (url, YtParams = {}, VmParams = {}) => {
         try {
             const urlObj = new URL(url);
             const id = urlObj.pathname.split('/').filter(segment => segment).pop();
-            console.log('Extracted Vimeo ID:', id); // Debug log
     
                 if (id) {
                     let base = `https://player.vimeo.com/video/${id}`;
                     const finalUrl = withParams(base, VmParams);
-                    console.log('Final embed URL:', finalUrl); // Debug log
                     return finalUrl;
                 }
         } catch (error) {
@@ -144,7 +119,7 @@ const embedUrl = (url, YtParams = {}, VmParams = {}) => {
     }
 
     // Fallback: return as-is
-    console.log('Using fallback URL:', url); // Debug log
+    console.error('Using fallback URL:', url);
     return url;
 }
 
@@ -154,15 +129,15 @@ function withParams(base, params) {
 }
 provide('embedUrl', embedUrl);
 
-
 </script>
 
 <template>
-    <header>
+    <header :class="isHome ? 'white-cursor' : 'black-cursor'">
         <router-link class="logo" to="/">
             <img class="logo" :src="isHome ? '/images/logow.png' : '/images/logob.png'" alt="Logo" />
         </router-link>
-        <nav :class="[isHome ? 'text-white' : 'text-black']">
+        <img @click="ACTIVATETHEBURGER = true" width="32px" height="32px" :src="isHome ? '/images/icons/burgerW.svg' : '/images/icons/burgerB.svg'" alt="">
+        <nav class="uppercase" :class="[isHome ? 'text-white' : 'text-black']">
             <router-link to="/work">Work</router-link>
             <router-link to="/shorts">Shorts</router-link>
             <router-link to="/about">About</router-link>
@@ -170,16 +145,42 @@ provide('embedUrl', embedUrl);
         </nav>
     </header>
 
+    <div v-if="ACTIVATETHEBURGER" class="burger-menu" >
+        <div class="flex justify-between self-stretch mb-[110px]">
+            <img class="logo" src="/public/images/logob.png" alt="Logo" />
+            <button @click="ACTIVATETHEBURGER = false" class="text-[32px] hover:opacite-50">✕</button>
+        </div>
+        <nav class="link-text flex flex-col items-center gap-[60px] text-[24px]">
+            <router-link @click="ACTIVATETHEBURGER = false" to="/work">Work</router-link>
+            <router-link @click="ACTIVATETHEBURGER = false" to="/shorts">Shorts</router-link>
+            <router-link @click="ACTIVATETHEBURGER = false" to="/about">About</router-link>
+            <router-link @click="ACTIVATETHEBURGER = false" to="/contact">Contact</router-link>
+        </nav>
+        <div class="mt-auto flex gap-[14px]">
+            <a href="https://www.tiktok.com/@mozgi.ai" class="social-link" aria-label="TikTok" target="_blank">
+                <img src="/public/images/icons/tiktokicon.svg" width="24" height="24" alt="TikTok">
+            </a>
+            <a href="https://www.youtube.com/@MozgiAI" class="social-link" aria-label="YouTube" target="_blank">
+                <img src="/public/images/icons/youtubeicon.svg" width="24" height="24" alt="YouTube">
+            </a>
+            <a href="https://www.instagram.com/mozgi.ai" class="social-link" aria-label="Instagram" target="_blank">
+                <img src="/public/images/icons/instagramicon.svg" width="24"  height="24" alt="Instagram">
+            </a>
+            <a href="https://www.facebook.com/share/1BJLkktYki" class="social-link" aria-label="Facebook" target="_blank">
+                <img src="/public/images/icons/facebookicon.svg" width="24" height="24" alt="Facebook">
+            </a>
+        </div>
+    </div>
+
     <router-view></router-view>
 </template>
 
 <style>
 header {
-    align-self: center;
+    z-index: 999;
+    width: 100%;
     display: flex;
-    flex-grow: 1;
     justify-content: space-between;
-    margin: auto;
     padding: 50px 50px 0px;
     max-width: 1540px;
 }
@@ -191,6 +192,11 @@ header nav {
     gap: 50px;
     font-weight: 500;
     font-size: 18px;
+    align-items: flex-start;
+}
+
+header > img {
+    display: none;
 }
 
 .video-background {
@@ -198,6 +204,13 @@ header nav {
     width: 100%;
     height: 100vh;
     overflow: hidden;
+}
+
+.exit{
+    font-size: 32px;
+}
+.exit:hover {
+    opacity: 0.5;
 }
 
 
@@ -208,12 +221,61 @@ header nav {
     max-width: 1540px;
 }
 
+.burger-menu {
+    background-color: white;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    inset: 0;
+    padding: 14px 14px 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 999;
+}
+
+.link-text {
+	font-size: 24px;
+	font-variation-settings: "wdth" 112.5;
+	font-weight: var(--font-weight-medium);
+	line-height: .8;
+	text-decoration: none;
+	text-transform: uppercase;
+	transition: color 0.3s;
+}
+
+.social-link {
+    background-color: black;
+    border-radius: 1000px;
+    padding: 10px;
+    margin-bottom: auto;
+}
+
+/* Normal cursor everywhere */
+body, #app {
+  cursor: url('/public/images/icons/cursors/black.svg') 25 36.25, auto;
+}
+
+/* Pointer cursor on clickable elements */
+a, button, img, video, iframe, footer, .clickable {
+  cursor: url('/public/images/icons/cursors/neutral.svg') 25 36.25, pointer;
+}
+
+.white-cursor {
+    cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, pointer;
+}
+
+.black-cursor {
+    cursor: url('/public/images/icons/cursors/black.svg') 25 36.25, pointer;
+}
+
+.neutral-cursor {
+    cursor: url('/public/images/icons/cursors/neutral.svg') 25 36.25, pointer;
+}
+
 @media (max-width: 1440px) {
     
 header {
-    display: flex;
-    flex-grow: 1;
-    justify-content: space-between;
     margin-bottom: 36px;
     padding: 14px 14px 0px;
 }
@@ -229,6 +291,15 @@ header {
 
 
 @media (max-width: 768px) {
+header img {
+    display: unset;
+}
+header img:hover {
+    opacity: 0.8;
+}
 
+header nav {
+    display: none;
+}
 }
 </style>

@@ -2,12 +2,7 @@
 import { computed, ref, inject } from 'vue';
 
 const content = inject('content');
-
 const images = computed (() => content.images.length ? content.images.map(img => img.img_url) : ['/storage/aboutScroll/placeholder.jpg']);
-
-console.log("Content in About.vue", content);
-console.log("Images in About.vue", images.value);
-
 const duplicatedImages = computed (() => {
     let result = [...images.value, ...images.value, ...images.value, ...images.value];
     
@@ -41,18 +36,14 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
                 </ul>
             </div>
             <p style="flex: 1;"><strong>Mozgi AI:</strong> Turning imagination into impact.</p>
-            <button><p>CONTACT US</p><img src="/public/images/arrowR.png" style="width: 30px;" alt=""></button>
+            <button><p>CONTACT US</p><img src="/public/images/arrowRW.png" style="width: 30px;" alt=""></button>
         </div>
     </div>
 
     <div class="scrolling-container"
     :style="{ '--halfway-point': halfwayPoint + 'px', '--time-per-loop': timePerLoop + 's' }">
         <div class="scrolling-content">
-            <img 
-            v-for="(img, index) in duplicatedImages" 
-            :class="index % 2 === 0 ? '' : 'evenImage'"
-            :key="index"
-            :src="img" />
+            <img v-for="(img, index) in duplicatedImages" :class="index % 2 === 0 ? '' : 'evenImage'" :key="index" :src="img" />
         </div>
     </div>
     </div>
@@ -95,7 +86,7 @@ ul li {
 
 
 .scrolling-container {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
@@ -109,8 +100,8 @@ ul li {
 }
 
 .scrolling-content img {
-    height: 207px;
-    width: 161px;
+    height: 180px;
+    width: 140px;
     margin-right: 30px;
     display: inline-block;
     object-fit: cover;
@@ -142,7 +133,8 @@ button {
 
 .container > h1 {
 	font-size: 20px;
-  margin: 36px 0 30px;
+    margin: 0;
+    width: 100%;
 }
 
 .container > div {
@@ -155,7 +147,7 @@ button {
 
 button {
 	align-items: center;
-	background: #262626;
+	background: black;
 	border-radius: 32px;
 	color: white;
 	display: flex;
@@ -169,7 +161,7 @@ button {
 }
 
 button:hover {
-    background: rgba(38, 38, 38, 0.8);
+    background: rgba(0, 0, 0, 0.8);
 }
 
 }

@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Illuminate\Support\Facades\Log;
 
 class VideoController extends Controller
 {
@@ -25,8 +24,6 @@ class VideoController extends Controller
     public function store(Request $request)
     {
         try {
-            Log::info($request->all());
-            Log::info('are we here?');
             // Validate the request
             $request->validate([
                 'title' => 'required|string|max:255',
@@ -37,16 +34,12 @@ class VideoController extends Controller
                 'video_url' => 'required_unless:isLocal,true|url|max:511',
                 'order' => 'required|integer'
             ]);
-
-            Log::info('are we here?');
             if ($request->isLocal === 'true') {
                 $filePath = $request->file('video_file')->store('content', 'public');
                 $contentUrl = '/storage/' . $filePath;
             } else {
                 $contentUrl = $request->video_url;
             }
-            Log::info('are we here?');
-            
             // Create the video record
             $video = Content::create([
                 'title' => $request->title,
@@ -56,12 +49,8 @@ class VideoController extends Controller
                 'content_url' => $contentUrl,
                 'order' => $request->order
             ]);
-            Log::info('are we here?');
-
             return response()->json($video, 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::info('oh oops, we raised an error!!!');
-            Log::info($e->errors());
             return response()->json([
                 'errors' => $e->errors()
             ], 422);
@@ -82,8 +71,6 @@ class VideoController extends Controller
     public function update(Request $request, Content $video)
     {
         try {
-            Log::info('we are the video!!!');
-            Log::info($request->all());
             // Validate the request
             $request->validate([
                 'title' => 'required|string|max:255',
@@ -124,8 +111,6 @@ class VideoController extends Controller
             
             return response()->json($video);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::info('oh oops, we raised an error!!!');
-            Log::info($e->errors());
             return response()->json([
                 'errors' => $e->errors()
             ], 422);
@@ -164,10 +149,8 @@ class VideoController extends Controller
         
         // Let's also check what files are in the directory
         $directory = dirname($path);
-        Log::info('Directory: ' . $directory);
         if (is_dir($directory)) {
             $files = scandir($directory);
-            Log::info('Files in directory: ' . json_encode($files));
         }
         
         if (!is_file($path)) {
@@ -184,12 +167,7 @@ class VideoController extends Controller
             list($start, $end) = $this->parseRange($range, $fileSize);
         }
 
-
-        Log::info('we get here1');
-
         $length = $end - $start + 1;
-
-        Log::info('we get here2');
 
         $response = new StreamedResponse(function() use ($path, $start, $length) {
             $handle = fopen($path, 'rb');
@@ -212,22 +190,14 @@ class VideoController extends Controller
             fclose($handle);
         });
 
-        Log::info('we get here3');
-
         $response->headers->set('Content-Type', 'video/mp4');
         $response->headers->set('Accept-Ranges', 'bytes');
         $response->headers->set('Content-Length', $length);
-
-
-        Log::info('we get here4');
         
         if ($request->hasHeader('Range')) {
             $response->setStatusCode(206); // Partial Content
             $response->headers->set('Content-Range', "bytes $start-$end/$fileSize");
         }
-
-
-        Log::info('we get here5');
 
         return $response;
     }

@@ -8,6 +8,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-    <div style="width: 100%; height: 100vh;" id="app"></div>
+    <div style="width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; align-content: stretch;" id="app"></div>
 </body>
 </html>

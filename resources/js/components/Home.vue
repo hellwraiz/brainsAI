@@ -1,22 +1,17 @@
 <script setup>
 import { ref, inject, computed, onMounted, onUnmounted, watch, reactive } from 'vue';
 import VideoModal from './VideoModal.vue';
-const isHovered = ref(false);
 const index = ref(0);
 
 const content = inject('content');
 const length = computed(() => content.videos.length);
 const video = computed(() => length ? content.videos[index.value] : null);
-
+const aspectRatio = ref(false)
 
 function getId() {
-  console.log("Ok, we got here!")
   if (length.value > 0) {
-  console.log("Ok, we got here! 1")
     const url = video.value.content_url;
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
-
-  console.log("Ok, we got here! 2")
       let id;
       try {
           if (url.includes('v=')) {
@@ -49,9 +44,7 @@ const videoStreamUrl = computed(() => `/videos/${video.value.id}/stream`)
 watch(index, (newIndex, oldIndex) => {
   // Pause all videos except the current one
   document.querySelectorAll('video').forEach(video => {
-    console.log('test test', video)
     if (video.src !== videoStreamUrl.value) {
-      console.log("paused video with index ", video.src)
       video.pause()
     }
   })
@@ -67,16 +60,26 @@ function handleScroll(event) {
   }
 }
 
+const updateIndexMobile = ((dir) => {
+  if (dir === 'r') {
+    index.value = (index.value + 1) % length.value;
+  } else if (dir === 'l') {
+    index.value = (index.value - 1 + length.value) % length.value;
+  }
+})
+
+const updateAspectRatio = (() => (aspectRatio.value = ((window.innerWidth/16)/(window.innerHeight/9))>=1))
+
 onMounted(() => {
-    window.addEventListener('wheel', handleScroll, {passive: false});
+  window.addEventListener('wheel', handleScroll, {passive: false});
+  window.addEventListener('resize', updateAspectRatio)
+  aspectRatio.value = ((window.innerWidth/16)/(window.innerHeight/9))>=1
 });
 
 onUnmounted(() => {
     window.removeEventListener('wheel', handleScroll);
+    window.removeEventListener('resize', updateAspectRatio)
 });
-
-
-
 
 const YtParams = reactive({
   controls: 0,
@@ -93,8 +96,6 @@ const YtParams = reactive({
 
 watch(video, () => {
   YtParams.playlist = getId()
-  console.log(getId())
-  console.log("this should have changed!!", YtParams)
 }, { immediate: true })
 
 const VmParams = {
@@ -118,20 +119,30 @@ const embedUrl = inject('embedUrl')
 
 <template>
   <div v-if="length > 0">
-    <div class="background-video">
-      <video v-if="video.isLocal === 'true'" :key="videoStreamUrl" :src="videoStreamUrl" preload="metadata" autoplay muted loop playsinline style="width: 100%; height:10 0%; object-fit: cover;" ></video>
-      <iframe v-else :src="embedUrl(video.content_url, YtParams, VmParams)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" style="width: 100%; height: 100%; object-fit: cover;"></iframe>
+    <video v-if="video.isLocal === 'true'" class="video-iframe fixed min-w-screen min-h-screen" :key="videoStreamUrl" :src="videoStreamUrl" preload="metadata" autoplay muted loop playsinline ></video>
+    <iframe v-else-if="aspectRatio" class="video-iframe fixed w-screen" :src="embedUrl(video.content_url, YtParams, VmParams)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    <div v-else class="iframe-container">
+      <iframe class="video-iframe h-screen" :src="embedUrl(video.content_url, YtParams, VmParams)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
     </div>
     <div class="videoElements">
-      <div>
+      <div class="videoText">
         <h1>{{ video.title }}</h1>
         <h2>{{ video.description }}</h2>
-        <button @click="selectedVideo = video">
-          <img :src="isHovered ? '/images/watch hover.png' : '/images/watch.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
-        </button>
+        <!--
+          <button class="watch-btn" @click="selectedVideo = video">
+            <img :src="isHovered ? '/images/watch hover.png' : '/images/watch.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
+          </button>
+        -->
+          <button class="watch-btn" @click="selectedVideo = video">
+            WATCH
+          </button>
       </div>
       <div class="listIndicators">
-        <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
+        <button class="index-btn" @click="updateIndexMobile('l')"><img src="/public/images/arrowLW.png" alt="left"></button>
+        <div class="flex gap-[10px]">
+          <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActive.png' : '/images/listItem.png'"/>
+        </div>
+        <button class="index-btn" @click="updateIndexMobile('r')"><img src="/public/images/arrowRW.png" alt="right"></button>
       </div>
     </div>
   </div>
@@ -141,16 +152,39 @@ const embedUrl = inject('embedUrl')
 </template>
 
 <style scoped>
-.background-video {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    height: 100vh;
-    z-index: -1;
-    background-color: black;
-    overflow: hidden;
+
+/* Normal cursor everywhere */
+video {
+  cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, auto !important;
 }
+
+.iframe-container {
+  cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, auto !important;
+  position: fixed;
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  inset: 0;
+  background-color: black;
+  margin: auto;
+}
+
+.video-iframe {
+  aspect-ratio: 16/9;
+  inset: 0;
+  margin: auto auto;
+  object-fit: cover;
+  background-color: black;
+}
+
+iframe {
+  pointer-events: none;
+}
+
 .videoElements {
+  cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, auto !important;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -164,19 +198,37 @@ const embedUrl = inject('embedUrl')
   color: white;
 }
 
+.videoText {
+  width: 40%;
+}
+
 h1 {
   font-size: 3.6em;
   font-weight: 600;
   margin: 0;
-  width: 40%;
+	font-size: 34px;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-bold);
+	letter-spacing: 0;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.page-title {
+	color: var(--color-text-primary);
+	font-family: var(--font-family-primary);
 }
 
 h2 {
   margin: 10px 0 30px;
-  width: 40%;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-normal);
+	line-height: 1.5;
+	text-transform: uppercase;
+  opacity: 0.9;
 }
 
-button {
+.watch-btn {
   background-color: white;
   color: black;
   border: none;
@@ -186,11 +238,91 @@ button {
   max-width: 500px;
 }
 
+.watch-button {
+	background: white;
+	border-radius: 32px;
+	color: black;
+	font-optical-sizing: auto;
+	font-size: 14px;
+	font-style: normal;
+	font-variation-settings: "wdth" 150;
+	font-weight: var(--font-weight-semibold);
+	padding: 13px 30px;
+	text-transform: uppercase;
+	transition: all 0.3s;
+  line-height: 1.15;
+}
+
+.index-btn img {
+  width: 32px;
+  height: 32px;
+}
+.index-btn:hover {
+  opacity: 50%;
+}
+
 .listIndicators {
   display: flex;
   flex-direction: row;
-  gap: 10px;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  align-self: flex-end;
 }
+
+.listIndicators img {
+  cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, auto !important;
+}
+
+.listIndicators > button {
+  display: none;
+}
+
+html, body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+
+@media (max-width: 1440px) {
+.videoElements {
+  flex-direction: column;
+  justify-content: unset;
+  align-items: center;
+  gap: 50px;
+}
+
+.videoText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.listIndicators > div > img {
+  width: 16px;
+  height: 16px;
+}
+
+.listIndicators {
+  align-self: stretch;
+}
+
+.listIndicators > button {
+  display: unset;
+}
+
+h1 {
+  font-size: 20px;
+  width: unset;
+}
+
+h2 {
+  font-size: 13px;
+  width: unset;
+}
+}
+
 
 </style>

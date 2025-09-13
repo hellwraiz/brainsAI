@@ -18,13 +18,14 @@ const selectedVideo = ref(null);
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div @click="selectedVideo = video" v-for="(video, index) in videos" :key="index">
-                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" width="704px" :class="index % 2 === 1 ? 'shifted' : ''" style="aspect-ratio: 16/9; object-fit: cover;"></video>
-                <img v-else :src="getVideoThumbnail(video.content_url)" width="704px" :class="index % 2 === 1 ? 'shifted' : ''" style="aspect-ratio: 16/9; object-fit: cover;" alt="Video thumbnail">
+                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" class="w-full desktop:w-[704px] aspect-16/9 object-cover" :class="index % 2 === 1 ? 'shifted' : ''"></video>
+                <img v-else :src="getVideoThumbnail(video.content_url)" class="w-full desktop:w-[704px] aspect-16/9 object-cover" :class="index % 2 === 1 ? 'shifted' : ''" alt="Video thumbnail">
             </div>
-            <button :class="videos.length % 2 == 1 ? 'shifted' : ''">
+            <a href="/contact" :class="videos.length % 2 == 1 ? 'shifted' : ''">
                 <img :src="isHovered ? '/images/contactUsHover.png' : '/images/contactUs.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
-            </button>
+            </a>
         </div>
+        <a href="/contact"><p>CONTACT US</p><img src="/public/images/arrowRW.png" style="width: 30px;" alt=""></a>
     </div>
 
     <VideoModal v-model="selectedVideo"/>
@@ -45,11 +46,11 @@ const selectedVideo = ref(null);
     transform: translateY(214px);
 }
 
-button.shifted {
-    transform: translateY(117.25px); /* half of 396px (video height) minus half of 161.5px (button height) */
+.videoGrid > a.shifted {
+    transform: translateY(calc(396px - 161.5px)); /* half of 396px (video height) minus half of 161.5px (button height) */
 }
 
-button {
+.videoGrid > a {
     transform: translateY(18.25px); /* quarter of 396px (video height) minus half of 161.5px (button height) */
 }
 
@@ -59,6 +60,63 @@ button {
     margin: 50px 0 50px;
     width: 60%;
     line-height: 1em;
+}
+
+.container > a {
+    display: none;
+}
+
+@media (max-width: 1440px) {
+    
+.videoGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.container {
+    padding-bottom: 30px;
+}
+
+.container > h1 {
+    width: 100%;
+	font-size: 20px;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-bold);
+	letter-spacing: 0;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+
+.shifted {
+    transform: translateY(0px);
+}
+
+.videoGrid > a {
+    display: none;
+}
+
+.container > a {
+    margin-top: 30px;
+	align-items: center;
+	background: black;
+	border-radius: 32px;
+	color: white;
+	display: flex;
+	font-size: 20px;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-bold);
+	justify-content: space-between;
+	padding: 18px 26px 18px 30px;
+	transition: all 0.3s ease;
+	width: 100%;
+}
+
+a:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
 }
 
 </style>

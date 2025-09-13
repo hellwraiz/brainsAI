@@ -76,23 +76,20 @@ const changeOrder = async (obj, dir) => {
 
   if (activeTab.value === 'videos' || activeTab.value === 'shorts') {
     uploadingFile.value = obj.isLocal
-    console.log("original object", obj)
-    console.log("original object", obj1)
-    editFormVid.id = obj.id
-    console.log('After id assignment:', editFormVid.id, 'should be:', obj.id)
-    editFormVid.title = obj.title
-    console.log('After title assignment:', editFormVid.title, 'should be:', obj.title)
-    editFormVid.description = obj.description
-    console.log("WHAT THE FUCK IS HAPPENING??????????", editFormVid)
-    console.log('After description assignment:', editFormVid.description, 'should be:', obj.description)
-    console.log("WHAT THE FUCK IS HAPPENING???", editFormVid)
-    editFormVid.isVideo = obj.isVideo === 'true'
-    editFormVid.isLocal = obj.isLocal === 'true'
-    editFormVid.order = obj1.order
-    editFormVid.file = null
-    editFormVid.file_url = ''
-    console.log('before first swap:', editFormVid);
-    console.log('IMMEDIATELY before updateVideo():', editFormVid); // Add this
+    Object.assign(editFormVid, {
+      value: obj.isLocal,
+      id: obj.id,
+      title: obj.title,
+      description: obj.description,
+      isVideo: obj.isVideo === 'true',
+      isLocal: obj.isLocal === 'true',
+      order: obj1.order,
+      file: null,
+      file_url: ''
+    })
+    console.log("what the actual fuck...", obj)
+    console.log("what the actual fuck...", editFormVid)
+    console.log(obj1.order)
     await updateVideo()
     uploadingFile.value = obj1.isLocal
     Object.assign(editFormVid, {
@@ -105,7 +102,6 @@ const changeOrder = async (obj, dir) => {
       file: null,
       file_url: ''
     })
-    console.log('before second swap:', editFormVid);
     await updateVideo()
   } else {
     editFormImg.value = {
@@ -188,7 +184,6 @@ const handleFileChange = (event) => {
 const updateVideo = async () => {
   try {
     editFormVid.isLocal = uploadingFile.value
-    console.log("editFormVid: ", editFormVid)
     const formData = new FormData()
     formData.append('title', editFormVid.title)
     formData.append('description', editFormVid.description)
@@ -197,11 +192,9 @@ const updateVideo = async () => {
     if (uploadingFile.value && editFormVid.file) {
       formData.append('video_file', editFormVid.file)
     } else if (!uploadingFile.value && editFormVid.file_url) {
-      console.log("aeontuhsaouet")
       formData.append('video_url', editFormVid.file_url)
     }
     formData.append('order', editFormVid.order)
-    console.log("formData: ", formData)
 
     showEditModalVid.value = false
 
@@ -308,8 +301,9 @@ const embedUrl = inject('embedUrl')
           <iframe v-else style="object-fit: cover;" :style="[ activeTab === 'videos' ? 'aspect-ratio: 16/9; height: 150px' : 'aspect-ratio: 9/16; height: 250px']" :src="embedUrl(video.content_url)" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 
           <div class="self-start flex flex-col gap-2">
-            <h2>{{ video.title }}{{ video.isLocal }}</h2>
+            <h2>{{ video.title }}</h2>
             <p class="text-[#666]" >{{ video.description }}</p>
+            <p class="text-[14px] text-[#666]">Is this video local? {{ video.isLocal }}</p>
           </div>
           
           <div class="ml-auto flex-col flex gap-2 align-center justify-center" >

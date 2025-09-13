@@ -41,13 +41,15 @@ const embedUrl = inject('embedUrl')
 
 <template>
         
-    <div v-if="modelValue" class="fixed inset-0 bg-[#262626] flex items-center justify-center z-50" @click.stop>
+    <div v-if="modelValue" class="fixed inset-0 bg-[#262626] z-50 flex items-center justify-center"  @click.stop>
         <button @click="$emit('update:modelValue', null)" class="exit">✕</button>
-        <div class="flex flex-col" :class="modelValue.isVideo ? 'max-w-[900px] w-[900px]' : 'max-w-[400px]'">
-            <video v-if="modelValue.isLocal === 'true'" :src="videoStreamUrl" controls autoplay class="object-contain" :class="modelValue.isVideo ? 'aspect-16/9' : 'aspect-9/16'"></video>
-            <iframe v-else :src="embedUrl(modelValue.content_url, YtParams, VmParams)" frameborder="0" allow="fullscreen" allowfullscreen class="object-contain" :class="modelValue.isVideo ? 'aspect-16/9' : 'aspect-9/16'"></iframe>
-            <h1>{{ modelValue.title }}</h1>
-            <h2>{{ modelValue.description }}</h2>
+        <div :class="modelValue.isVideo === 'true' ? 'flex flex-col-reverse' : 'short-container'" >
+            <div class="flex flex-col items-center desktop:items-start">
+                <h1>{{ modelValue.title }}</h1>
+                <h2>{{ modelValue.description }}</h2>
+            </div>
+            <video v-if="modelValue.isLocal === 'true'" :src="videoStreamUrl" controls autoplay class="object-contain" :class="modelValue.isVideo === 'true' ? 'aspect-16/9 w-screen desktop:w-[900px]' : 'aspect-9/16 w-screen desktop:w-[400px]'"></video>
+            <iframe v-else :src="embedUrl(modelValue.content_url, YtParams, VmParams)" frameborder="0" allow="fullscreen" allowfullscreen class="object-contain" :class="modelValue.isVideo === 'true' ? 'aspect-16/9 w-screen desktop:w-[900px]' : 'aspect-9/16 w-screen desktop:w-[400px]'"></iframe>
         </div>
     </div>
 </template>
@@ -64,17 +66,58 @@ const embedUrl = inject('embedUrl')
 .exit:hover {
     opacity: 0.5;
 }
+
+.short-container {
+    display: grid;
+    padding: 50px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+    align-items: end;
+}
+
 h1 {
     padding: 40px 0px 20px;
     color: white;
-    font-size: 3em;
-    font-weight: 600;
+    font-size: 34px;
     text-transform: uppercase;
-    line-height: 1em;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-bold);
+	letter-spacing: 0;
+	line-height: 1;
+	text-transform: uppercase;
 }
 h2 {
     color: white;
     white-space: pre-line;
-    line-height: 1.2em;
+    line-height: 1.5;
+    font-size: 15px;
+    max-width: 480px;
+}
+@media (max-width: 1440px) {
+
+.exit {
+    top: 15px;
+    right: 15px;
+}
+
+.short-container {
+    gap: 0px;
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 62px 14px 32px;
+    align-items: center;
+}
+
+h1 {
+    font-size: 20px;
+    text-align: center;
+}
+
+h2 {
+    font-size: 13px;
+    max-width: 270px;
+    text-align: center;
+}
+
 }
 </style>

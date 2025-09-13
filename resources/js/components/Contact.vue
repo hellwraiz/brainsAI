@@ -74,6 +74,21 @@ const validateForm = () => {
   return isValid
 }
 
+const getFileIcon = (filename) => {
+  const ext = filename.split('.').pop().toLowerCase();
+  const iconMap = {
+    pdf: '/images/icons/fileExtensions/pdf.svg',
+    word: '/images/icons/fileExtensions/word.svg',
+    doc: '/images/icons/fileExtensions/word.svg',
+    docx: '/images/icons/fileExtensions/word.svg',
+    jpg: '/images/icons/fileExtensions/jpg.svg',
+    jpeg: '/images/icons/fileExtensions/jpg.svg',
+    png: '/images/icons/fileExtensions/png.svg',
+    xl: '/images/icons/fileExtensions/xl.svg'
+  };
+  return iconMap[ext] || '/images/icons/fileExtensions/xl.svg';
+};
+
 // Handle form submission
 const handleSubmit = async () => {
   if (!validateForm()) return
@@ -128,11 +143,9 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-
-    <div class="flex justify-between flex-col" >
-      <div class="containerr self-center" >
+      <div class="container" >
           <h1>TALK TO THE BRAINS BEHIND MOZGI. GOT A WILD IDEA? WE’VE GOT WILDER SOLUTIONS.</h1>
-          <div class="flex gap-5">
+          <div class="flex flex-col desktop:flex-row gap-[20px] desktop:gap-5">
               <!-- Social Media Icons -->
               <div class="flex gap-[18px]">
                   <a href="https://www.tiktok.com/@mozgi.ai" class="social-link" aria-label="TikTok" target="_blank">
@@ -150,7 +163,7 @@ const handleSubmit = async () => {
               </div>
   
               <!-- Contact Info -->
-              <div class="flex gap-10">
+              <div class="flex flex-col desktop:flex-row gap-[20px] desktop:gap-10">
                   <div class="flex flex-col">
                       <span class="info-label">ADDRESS</span>
                       <address class="info-value not-italic leading-none" >Carrer de Larrard, 20, Gràcia, 08012 Barcelona<br>1830 Radius Drive Hollywood, FL 33020</address>
@@ -166,84 +179,53 @@ const handleSubmit = async () => {
   
       <footer>
           <div>
-              <h1 class="text-white font-bold text-[34px]/1 m-0">CONTACT US</h1>
+              <h1>CONTACT US</h1>
               <form @submit.prevent="handleSubmit" class="">
-                  <div class="flex gap-[145px] justify-between items-center">
-                      <div class="flex flex-col gap-[25px] mt-auto" >
-                          <div class="flex gap-[20px]">
-                              <div class="w-[280px] mb-[33px] relative">
+                  <div class="contact-container">
+                      <div class="contact-form" >
+                          <div class="flex flex-col desktop:flex-row desktop:gap-[20px]">
+                              <div class="input-box-top">
                                   <label for="name" class="input-label">Name</label>
-                                  <input
-                                  id="name"
-                                  v-model="form.name"
-                                  type="text"
-                                  required
-                                  class="input-field"
-                                  :class="{ 'border-red-500': errors.name }"
-                                  placeholder="Your Name"
-                                  />
+                                  <input id="name" v-model="form.name" type="text" required class="input-field" :class="{ 'border-red-500': errors.name }" placeholder="Your Name"/>
                                   <span v-if="errors.name" class="text-red-500 text-sm">{{ errors.name }}</span>
                               </div>
               
                               <div class="input-box-top">
                                   <label for="email" class="input-label">Email</label>
-                                  <input
-                                  id="email"
-                                  v-model="form.email"
-                                  type="email"
-                                  required
-                                  class="input-field"
-                                  :class="{ 'border-red-500': errors.email }"
-                                  placeholder="Your Email"
-                                  />
+                                  <input id="email" v-model="form.email" type="email" required class="input-field" :class="{ 'border-red-500': errors.email }" placeholder="Your Email"/>
                                   <span v-if="errors.email" class="text-red text-sm">{{ errors.email }}</span>
                               </div>
               
-                              <div class="w-[280px] mb-[33px] relative">
+                              <div class="input-box-top">
                                   <label for="phone" class="input-label">Phone</label>
-                                  <input
-                                  id="phone"
-                                  v-model="form.phone"
-                                  type="tel"
-                                  class="input-field"
-                                  :class="{ 'border-red-500': errors.phone }"
-                                  placeholder="Your Phone"
-                                  />
+                                  <input id="phone" v-model="form.phone" type="tel" class="input-field" :class="{ 'border-red-500': errors.phone }" placeholder="Your Phone"/>
                                   <span v-if="errors.phone" class="text-red-500 text-sm">{{ errors.phone }}</span>
                               </div>
                           </div>
           
-                          <div class="flex gap-[34px] items-center">
-                              <div class="w-[660px] relative">
+                          <div class="flex flex-col desktop:flex-row desktop:gap-[34px] items-center">
+                              <div class="w-full desktop:w-[660px] relative">
                                   <label for="description" class="input-label">Description</label>
-                                  <textarea
-                                  id="description"
-                                  v-model="form.description"
-                                  required
-                                  rows=1
-                                  class="input-field input-field--alt max-h-[120px]"
-                                  :class="{ 'border-red-500': errors.description }"
-                                  placeholder="Tell us about your project..."
-                                  ></textarea>
+                                  <textarea id="description" v-model="form.description" required rows=1 class="mb-[24px] desktop:mb-0 input-field input-field--alt max-h-[120px]" :class="{ 'border-red-500': errors.description }" placeholder="Tell us about your project..."></textarea>
                                   <span v-if="errors.description" class="text-red-500 text-sm">{{ errors.description }}</span>
                               </div>
               
-                              <div>
-                                  <input
-                                  id="files"
-                                  @change="handleFileChange"
-                                  type="file"
-                                  multiple
-                                  accept="image/*,.pdf,.doc,.docx"
-                                  class="sr-only">
-                                <img class="w-[180px]" src="/public/images/send_materials.png" alt="">  
-                                </input>
+                              <div class="flex flex-col self-stretch desktop:self-center ">
+                                  <label for="files" class="self-end cursor-pointer">
+                                    <img src="/public/images/send_materials.png" alt="Upload" class="w-[180px] hover:opacity-50">
+                                  </label>
+                                  <input id="files" class="hidden" @change="handleFileChange" type="file" multiple accept="image/*,.pdf,.doc,.docx"/>
                                   
                                   <!-- File List -->
-                                  <div v-if="selectedFiles.length > 0" class="mt-2">
-                                  <div v-for="(file, index) in selectedFiles" :key="index" class="flex items-center justify-between bg-gray-100 p-2 rounded mb-1">
-                                      <span class="text-sm">{{ file.name }}</span>
-                                      <button @click="removeFile(index)" type="button" class="text-red-500 hover:text-red-700 text-sm">Remove</button>
+                                  <div v-if="selectedFiles.length > 0">
+                                  <div v-for="(file, index) in selectedFiles" :key="index" class=" text-white flex items-center py-[12px] gap-[10px] justify-between">
+                                    <img :src="getFileIcon(file.name)" class="w-10 h-10">
+                                    <div class="flex">
+                                      <span class="file-text">{{ file.name }}</span>
+                                      <button @click="removeFile(index)" type="button" class="w-[26px] p-[5px]">
+                                        <img class="close-img" src="/public/images/icons/close.svg" alt="">
+                                      </button>
+                                    </div>  
                                   </div>
                                   </div>
                               </div>
@@ -251,12 +233,12 @@ const handleSubmit = async () => {
                       </div>
       
                       <!-- Submit Button -->
-                      <button
-                      type="submit"
-                      :disabled="isSubmitting"
-                      class="w-[220px] h-[220px]"
-                      >
+                      <button type="submit" :disabled="isSubmitting" class="form-submit-btn-desk">
                       <img src="/public/images/send_laptop.png" alt="send">
+                      </button>
+                      <button type="submit" class="form-submit-btn" aria-label="Send request">
+                        <img width="36" height="36" src="/public/images/icons/send.svg" alt="send">
+                        <span>SEND A REQUEST</span>
                       </button>
                   </div>
   
@@ -267,32 +249,46 @@ const handleSubmit = async () => {
                   <div v-if="errorMessage" class="bg-red-100 text-red-700 p-3 rounded-md">
                       {{ errorMessage }}
                   </div>
+                  <div id="form-messages" class="form-messages"></div>
               </form>
           </div>
       </footer>
-    </div>
 </template>
 
 <style scoped>
 
-.containerr {
-    justify-items: center;
-    padding: 0px 50px 50px;
-    max-width: 1540px;
+.container {
+  padding-bottom: 76px;
 }
 
-.containerr > h1 {
-  font-size: 2.4em;
+.container > h1 {
+  font-size: 34px;
+  font-variation-settings: "wdth" 125;
+  letter-spacing: 0;
+  line-height: 1;
   font-weight: 900;
   margin: 50px 0 30px;
-  width: 60%;
-  line-height: 1em;
+  width: 65%;
 }
 
-.containerr > div {
+.container > div {
     display: flex;
     width: 80%;
     gap: 20px;
+}
+
+.contact-container {
+  display: flex;
+  gap: 145px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin: auto 0px 24px;
 }
 
 .social-link {
@@ -314,43 +310,44 @@ const handleSubmit = async () => {
     text-transform: uppercase;
 }
 
+.form-messages {
+  position: absolute;
+  bottom: -30px;
+  margin-top: 30px;
+}
+
 .info-value:hover {
     opacity: 0.5;
 }
 
 footer {
-    position: fixed;
-    bottom: 0;
-    background-color: #262626;
-    padding: 55px 0px 20px;
-    display: flex;
-    width: 100%;
+  margin-top: auto;
+  background-color: #262626;
+  padding: 55px 50px 70px;
+  display: flex;
+  width: 100%;
+  cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, auto;
 }
 
 footer > div {
     margin: auto;
-    padding: 0px 50px 50px;
-    width: 1540px;
+    width: 100%;
+    max-width: 1540px;
+}
+
+form {
+  position: relative;
 }
 
 footer h1 {
-  font-size: 2.4em;
+  color: white;
+  line-height: 1;
   font-weight: 900;
+  font-size: 34px;
 }
 
+.close-img:hover { content: url('/public/images/icons/closeRed.svg'); }
 
-
-.input-field {
-  width: 280px;
-  background-color: white;
-  border-radius: 4px;
-  border: 2px solid rgba(#fff, .2);
-  padding: 11px 5px 12px 24px;
-  font-size: 16px;
-  letter-spacing: .3px;
-  line-height: 1.5;
-  font-variation-settings: "width" 112.5;
-}
 
 .input-field--alt {
   width: 660px;
@@ -360,6 +357,17 @@ footer h1 {
   width: 280px;
   margin-bottom: 33px;
   position: relative;
+}
+.input-field {
+  width: 100%;
+  background-color: white;
+  border-radius: 4px;
+  border: 2px solid rgba(#fff, .2);
+  padding: 11px 5px 12px 24px;
+  font-size: 16px;
+  letter-spacing: .3px;
+  line-height: 1.5;
+  font-variation-settings: "width" 112.5;
 }
 
 .input-label {
@@ -372,6 +380,90 @@ footer h1 {
   text-transform: uppercase;
   font-variation-settings: "width" 112.5;
   font-weight: 500;
+}
+
+.form-submit-btn {
+  display: none;
+}
+.form-submit-btn-desk {
+  height: 220px;
+  width: 220px;
+}
+
+.file-text {
+	font-size: 15px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+  text-align: right;
+}
+
+
+/* THIS STUFF IS ALL FOR MAKING IT WORK ON MOBILE */
+
+@media (max-width: 1440px) {
+.container > h1 {
+  margin-top: 0;
+  font-size: 20px;
+  text-transform: uppercase;
+  width: 100%;
+}
+
+.container {
+  padding-bottom: 30px;
+}
+
+footer {
+  margin-top: 0px;
+  padding: 30px 14px 40px;
+  display: flex;
+  width: 100%;
+}
+
+footer h1 {
+  font-size: 20px;
+  margin-bottom: 39px;
+}
+
+.contact-container {
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-form {
+  width: 100%;
+  gap: 0px
+}
+
+.input-box-top {
+  width: 100%;
+}
+
+.form-submit-btn {
+  background-color: white;
+  color: black;
+  gap: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 32px;
+  font-size: 20px;
+	font-variation-settings: "wdth" 125;
+	font-weight: var(--font-weight-bold);
+	padding: 18px 26px 18px 30px;
+	text-decoration: none;
+	text-transform: uppercase;
+  width: 100%;
+}
+
+.form-submit-btn-desk {
+  display: none;
+}
+
+.file-text {
+  font-size: 14px;
+}
+
 }
 
 </style>

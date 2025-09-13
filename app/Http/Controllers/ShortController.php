@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Illuminate\Support\Facades\Log;
 
 class ShortController extends Controller
 {
@@ -25,8 +24,6 @@ class ShortController extends Controller
     public function store(Request $request)
     {
         try {
-            Log::info($request->all());
-            Log::info('are we here?');
             // Validate the request
             $request->validate([
                 'title' => 'required|string|max:255',
@@ -57,8 +54,6 @@ class ShortController extends Controller
             ]);
             return response()->json($reel, 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::info('oh oops, we raised an error!!!');
-            Log::info($e->errors());
             return response()->json([
                 'errors' => $e->errors()
             ], 422);
@@ -79,8 +74,6 @@ class ShortController extends Controller
     public function update(Request $request, Content $reel)
     {
         try {
-            Log::info('we are the short!!!');
-            Log::info($request->all());
             // Validate the request
             $request->validate([
                 'title' => 'required|string|max:255',
@@ -121,8 +114,6 @@ class ShortController extends Controller
             
             return response()->json($reel);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::info('oh oops, we raised an error!!!');
-            Log::info($e->errors());
             return response()->json([
                 'errors' => $e->errors()
             ], 422);
