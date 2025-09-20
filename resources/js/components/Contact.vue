@@ -1,78 +1,54 @@
 <script setup>
 
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import axios from 'axios'
 
-// Form data
 const form = reactive({
   name: '',
   email: '',
   phone: '',
   description: ''
 })
-
-// File handling
 const selectedFiles = ref([])
-
-// Form state
-const isSubmitting = ref(false)
-const successMessage = ref('')
-const errorMessage = ref('')
+const message = ref('')
 const errors = reactive({})
+const isValid = ref(false)
 
-// Handle file selection
 const handleFileChange = (event) => {
   const files = Array.from(event.target.files)
-  
-  // Validate file size (5MB limit)
-  const validFiles = files.filter(file => {
-    if (file.size > 5 * 1024 * 1024) {
-      errorMessage.value = `File "${file.name}" is too large. Maximum size is 5MB.`
-      return false
-    }
-    return true
-  })
-  
-  selectedFiles.value = [...selectedFiles.value, ...validFiles]
+  selectedFiles.value = [...selectedFiles.value, ...files]
 }
 
-// Remove file from selection
 const removeFile = (index) => {
   selectedFiles.value.splice(index, 1)
 }
 
-// Clear messages
 const clearMessages = () => {
-  successMessage.value = ''
-  errorMessage.value = ''
+  message.value = ''
   Object.keys(errors).forEach(key => delete errors[key])
 }
 
-// Validate form
 const validateForm = () => {
   clearMessages()
-  let isValid = true
-
-  if (!form.name.trim()) {
-    errors.name = 'Name is required'
-    isValid = false
-  }
+  isValid.value = true
 
   if (!form.email.trim()) {
-    errors.email = 'Email is required'
-    isValid = false
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    errors.email = 'Please enter a valid email address'
-    isValid = false
+    errors.email = true
+    message.value = "Please enter an email"
+    isValid.value = false
+  } else if (!/^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/.test(form.email)) {
+    errors.email = true
+    message.value = "Please enter a valid email"
+    isValid.value = false
   }
 
-  if (!form.description.trim()) {
-    errors.description = 'Description is required'
-    isValid = false
+  if (!form.name.trim()) {
+    errors.name = true
+    message.value = "Please enter a valid name"
+    isValid.value = false
   }
-
-  return isValid
 }
+watch(form, validateForm, { deep: true })
 
 const getFileIcon = (filename) => {
   const ext = filename.split('.').pop().toLowerCase();
@@ -91,9 +67,10 @@ const getFileIcon = (filename) => {
 
 // Handle form submission
 const handleSubmit = async () => {
-  if (!validateForm()) return
+  validateForm()
+  if (!isValid.value) return
 
-  isSubmitting.value = true
+  isValid.value = false
   clearMessages()
 
   try {
@@ -101,8 +78,12 @@ const handleSubmit = async () => {
     const formData = new FormData()
     formData.append('name', form.name)
     formData.append('email', form.email)
-    formData.append('phone', form.phone)
-    formData.append('description', form.description)
+    if (form.phone) {
+      formData.append('phone', form.phone)
+    }
+    if (form.description) {
+      formData.append('message', form.description)
+    }
     
     // Append files
     selectedFiles.value.forEach((file, index) => {
@@ -110,14 +91,11 @@ const handleSubmit = async () => {
     })
 
     // Send to your Laravel backend
-    const response = await axios.post('/contact', formData, {
+    await axios.post('/submit-form', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
-
-    // Success
-    successMessage.value = 'Thank you! Your message has been sent successfully.'
     
     // Reset form
     Object.keys(form).forEach(key => form[key] = '')
@@ -127,17 +105,22 @@ const handleSubmit = async () => {
     const fileInput = document.getElementById('files')
     if (fileInput) fileInput.value = ''
 
+    setTimeout(() => {
+      // Success
+      isValid.value = true;
+      message.value = 'Thank you! Your message has been sent successfully.'
+    }, 100)
+
   } catch (error) {
     console.error('Contact form error:', error)
     
     if (error.response?.data?.errors) {
-      // Handle Laravel validation errors
-      Object.assign(errors, error.response.data.errors)
+      console.error(error.response.data.errors)
     } else {
-      errorMessage.value = 'Sorry, there was an error sending your message. Please try again.'
+      message.value = 'Sorry, there was an error sending your message. Please try again at a later time.'
     }
   } finally {
-    isSubmitting.value = false
+    isValid.value = true
   }
 }
 </script>
@@ -186,35 +169,31 @@ const handleSubmit = async () => {
                           <div class="flex flex-col desktop:flex-row desktop:gap-[20px]">
                               <div class="input-box-top">
                                   <label for="name" class="input-label">Name</label>
-                                  <input id="name" v-model="form.name" type="text" required class="input-field" :class="{ 'border-red-500': errors.name }" placeholder="Your Name"/>
-                                  <span v-if="errors.name" class="text-red-500 text-sm">{{ errors.name }}</span>
+                                  <input id="name" v-model="form.name" type="text" class="input-field" :class="{ 'input-field-bad': errors.name }" placeholder="Your Name"/>
                               </div>
               
                               <div class="input-box-top">
                                   <label for="email" class="input-label">Email</label>
-                                  <input id="email" v-model="form.email" type="email" required class="input-field" :class="{ 'border-red-500': errors.email }" placeholder="Your Email"/>
-                                  <span v-if="errors.email" class="text-red text-sm">{{ errors.email }}</span>
+                                  <input id="email" v-model="form.email" type="email" class="input-field" :class="{ 'input-field-bad': errors.email }" placeholder="Your Email"/>
                               </div>
               
                               <div class="input-box-top">
                                   <label for="phone" class="input-label">Phone</label>
-                                  <input id="phone" v-model="form.phone" type="tel" class="input-field" :class="{ 'border-red-500': errors.phone }" placeholder="Your Phone"/>
-                                  <span v-if="errors.phone" class="text-red-500 text-sm">{{ errors.phone }}</span>
+                                  <input id="phone" v-model="form.phone" type="tel" class="input-field" placeholder="Your Phone"/>
                               </div>
                           </div>
           
                           <div class="flex flex-col desktop:flex-row desktop:gap-[34px] items-center">
                               <div class="w-full desktop:w-[660px] relative">
                                   <label for="description" class="input-label">Description</label>
-                                  <textarea id="description" v-model="form.description" required rows=1 class="mb-[24px] desktop:mb-0 input-field input-field--alt max-h-[120px]" :class="{ 'border-red-500': errors.description }" placeholder="Tell us about your project..."></textarea>
-                                  <span v-if="errors.description" class="text-red-500 text-sm">{{ errors.description }}</span>
+                                  <textarea id="description" v-model="form.description" rows=1 class="mb-[24px] desktop:mb-0 input-field input-field--alt max-h-[120px]" :class="{ 'border-red-500': errors.description }" placeholder="Tell us about your project..."></textarea>
                               </div>
               
                               <div class="flex flex-col self-stretch desktop:self-center ">
                                   <label for="files" class="self-end cursor-pointer">
                                     <img src="/public/images/send_materials.png" alt="Upload" class="w-[180px] hover:opacity-50">
                                   </label>
-                                  <input id="files" class="hidden" @change="handleFileChange" type="file" multiple accept="image/*,.pdf,.doc,.docx"/>
+                                  <input id="files" class="hidden" @change="handleFileChange" type="file" multiple/>
                                   
                                   <!-- File List -->
                                   <div v-if="selectedFiles.length > 0">
@@ -233,23 +212,15 @@ const handleSubmit = async () => {
                       </div>
       
                       <!-- Submit Button -->
-                      <button type="submit" :disabled="isSubmitting" class="form-submit-btn-desk">
-                      <img src="/public/images/send_laptop.png" alt="send">
+                      <button type="submit" :class="isValid ? '' : 'invalid'" :disabled="!isValid" class="form-submit-btn-desk">
+                        <img src="/public/images/send_laptop.png" alt="send">
                       </button>
-                      <button type="submit" class="form-submit-btn" aria-label="Send request">
+                      <button type="submit" :class="isValid ? '' : 'invalid'" :disabled="!isValid" class="form-submit-btn" aria-label="Send request">
                         <img width="36" height="36" src="/public/images/icons/send.svg" alt="send">
                         <span>SEND A REQUEST</span>
                       </button>
                   </div>
-  
-                  <!-- Success/Error Messages -->
-                  <div v-if="successMessage" class="bg-green-100 text-green-700 p-3 rounded-md">
-                      {{ successMessage }}
-                  </div>
-                  <div v-if="errorMessage" class="bg-red-100 text-red-700 p-3 rounded-md">
-                      {{ errorMessage }}
-                  </div>
-                  <div id="form-messages" class="form-messages"></div>
+                  <div id="form-messages" :class="isValid ? 'success' : 'failure'" class="form-messages">{{ message }}</div>
               </form>
           </div>
       </footer>
@@ -267,7 +238,7 @@ const handleSubmit = async () => {
   letter-spacing: 0;
   line-height: 1;
   font-weight: 900;
-  margin: 50px 0 30px;
+  margin: 36px 0 30px;
   width: 65%;
 }
 
@@ -315,9 +286,15 @@ const handleSubmit = async () => {
   bottom: -30px;
   margin-top: 30px;
 }
+.success {
+  color: green;
+}
+.failure {
+  color: red;
+}
 
 .info-value:hover {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 footer {
@@ -362,12 +339,20 @@ footer h1 {
   width: 100%;
   background-color: white;
   border-radius: 4px;
-  border: 2px solid rgba(#fff, .2);
+  border: 2px solid transparent;
   padding: 11px 5px 12px 24px;
   font-size: 16px;
   letter-spacing: .3px;
   line-height: 1.5;
+  transition: all 0.3s ease;
   font-variation-settings: "width" 112.5;
+}
+.input-field:hover {
+  cursor: url('/public/images/icons/cursors/neutral.svg') 25 36.25, pointer;
+  opacity: 0.8;
+}
+.input-field-bad {
+  border-color: red;
 }
 
 .input-label {
@@ -386,8 +371,18 @@ footer h1 {
   display: none;
 }
 .form-submit-btn-desk {
+  transition: all ease 0.3s;
   height: 220px;
   width: 220px;
+}
+.form-submit-btn-desk img:hover {
+  content: url('/public/images/send_laptop_hover.png')
+}
+.form-submit-btn-desk.invalid {
+  opacity: 0.7;
+}
+.form-submit-btn-desk.invalid img:hover {
+  content: unset
 }
 
 .file-text {
@@ -403,7 +398,6 @@ footer h1 {
 
 @media (max-width: 1440px) {
 .container > h1 {
-  margin-top: 0;
   font-size: 20px;
   text-transform: uppercase;
   width: 100%;
@@ -454,6 +448,13 @@ footer h1 {
 	text-decoration: none;
 	text-transform: uppercase;
   width: 100%;
+  transition: all ease 0.3s;
+}
+.form-submit-btn:hover {
+  opacity: 0.8;
+}
+.form-submit-btn.inactive {
+  opacity: 0.7;
 }
 
 .form-submit-btn-desk {

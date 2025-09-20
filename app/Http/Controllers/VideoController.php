@@ -85,8 +85,8 @@ class VideoController extends Controller
             // Handle new file upload if provided
             if ($request->isLocal && $video->isLocal && $request->hasFile('video_file')) {
                 // Delete old file
-                $oldFilePath = str_replace('storage/', 'public/', $video->content_url);
-                Storage::delete($oldFilePath);
+                $oldFilePath = str_replace('/storage/', '', $video->content_url);
+                Storage::disk('public')->delete($oldFilePath);
                 
                 // Store new file
                 $filePath = $request->file('video_file')->store('content', 'public');
@@ -97,8 +97,8 @@ class VideoController extends Controller
                 $video->content_url = '/storage/' . $filePath;
             } else if (! $request->isLocal && $video->isLocal && $request->video_url) {
                 // Delete old file
-                $oldFilePath = str_replace('storage/', 'public/', $video->content_url);
-                Storage::delete($oldFilePath);
+                $oldFilePath = str_replace('/storage/', '', $video->content_url);
+                Storage::disk('public')->delete($oldFilePath);
                 
                 $video->content_url = $request->video_url;
             } else if (! $request->isLocal && ! $video->isLocal && $request->video_url) {
@@ -146,12 +146,6 @@ class VideoController extends Controller
         // Convert URL path to actual file path
         $relativePath = str_replace('/storage/', '', $video->content_url);
         $path = Storage::disk('public')->path($relativePath);
-        
-        // Let's also check what files are in the directory
-        $directory = dirname($path);
-        if (is_dir($directory)) {
-            $files = scandir($directory);
-        }
         
         if (!is_file($path)) {
             abort(404, 'Video file not found or is not a file');

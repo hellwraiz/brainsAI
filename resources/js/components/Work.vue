@@ -17,15 +17,15 @@ const selectedVideo = ref(null);
     <div v-if="!selectedVideo" class="container">
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
-            <div @click="selectedVideo = video" v-for="(video, index) in videos" :key="index">
-                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" class="w-full desktop:w-[704px] aspect-16/9 object-cover" :class="index % 2 === 1 ? 'shifted' : ''"></video>
-                <img v-else :src="getVideoThumbnail(video.content_url)" class="w-full desktop:w-[704px] aspect-16/9 object-cover" :class="index % 2 === 1 ? 'shifted' : ''" alt="Video thumbnail">
+            <div @click="selectedVideo = video" :class="index % 2 === 1 ? 'shifted' : ''" v-for="(video, index) in videos" :key="index">
+                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" class="w-full desktop:w-[704px] aspect-16/9 object-cover"></video>
+                <img v-else :src="getVideoThumbnail(video.content_url)" class="w-full desktop:w-[704px] aspect-16/9 object-cover" alt="Video thumbnail">
             </div>
             <a href="/contact" :class="videos.length % 2 == 1 ? 'shifted' : ''">
-                <img :src="isHovered ? '/images/contactUsHover.png' : '/images/contactUs.png'" alt="watch button" @mouseenter="isHovered = true" @mouseleave="isHovered = false" />
+                <img src="/public/images/contactUs.png" class="hover:opacity-80" alt="contact button"/>
             </a>
         </div>
-        <a href="/contact"><p>CONTACT US</p><img src="/public/images/arrowRW.png" style="width: 30px;" alt=""></a>
+        <a href="/contact"><p>CONTACT US</p><img src="/public/images/arrowRW.png" style="width: 30px;" alt="contact button"></a>
     </div>
 
     <VideoModal v-model="selectedVideo"/>
@@ -41,17 +41,34 @@ const selectedVideo = ref(null);
     grid-gap: 32px;
     justify-items: center;
 }
-
 .shifted {
     transform: translateY(214px);
 }
-
 .videoGrid > a.shifted {
     transform: translateY(calc(396px - 161.5px)); /* half of 396px (video height) minus half of 161.5px (button height) */
 }
-
 .videoGrid > a {
     transform: translateY(18.25px); /* quarter of 396px (video height) minus half of 161.5px (button height) */
+}
+
+.videoGrid div {
+    overflow: hidden;
+}
+.videoGrid video,
+.videoGrid img {
+    transition: all 0.3s ease
+}
+.videoGrid > div > video:hover,
+.videoGrid > div > img:hover {
+    transform: scale(1.25);
+}
+.videoGrid video.shifted:hover,
+.videoGrid img.shifted:hover {
+    transform: scale(1.25);
+    transform: translateY(214px);
+}
+.videoGrid:last-child:hover {
+    transform: scale(1);
 }
 
 .container > h1 {

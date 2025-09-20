@@ -41,7 +41,7 @@ const embedUrl = inject('embedUrl')
 
 <template>
         
-    <div v-if="modelValue" class="fixed inset-0 bg-[#262626] z-50 flex items-center justify-center"  @click.stop>
+    <div v-if="modelValue" class="fixed inset-0 bg-[#262626] z-1000 flex items-center justify-center"  @click.stop>
         <button @click="$emit('update:modelValue', null)" class="exit">✕</button>
         <div :class="modelValue.isVideo === 'true' ? 'flex flex-col-reverse' : 'short-container'" >
             <div class="flex flex-col items-center desktop:items-start">

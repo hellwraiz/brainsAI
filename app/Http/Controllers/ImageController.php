@@ -6,6 +6,7 @@ use App\Models\ScrollImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ImageController extends Controller
 {
@@ -22,22 +23,33 @@ class ImageController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the request
-        $request->validate([
-            'img_file' => 'required|required|file|mimes:jpg,jpeg,png,webp,gif|max:51200', // 50MB max
-            'order' => 'required|integer'
-        ]);
+        try {
+            Log::info($request->all());
+            Log::info("so what's up here??");
+            // Validate the request
+            $request->validate([
+                'img_file' => 'required|required|file|mimes:jpg,jpeg,png,webp,gif|max:51200', // 50MB max
+                'order' => 'required|integer'
+            ]);
+    
+            $filePath = $request->file('img_file')->store('aboutScroll', 'public');
+            $contentUrl = '/storage/' . $filePath;
+            
+            // Create the video record
+            $scrollImage = ScrollImage::create([
+                'img_url' => $contentUrl,
+                'order' => $request->order
+            ]);
+            
+            return response()->json($scrollImage, 201);
 
-        $filePath = $request->file('img_file')->store('aboutScroll', 'public');
-        $contentUrl = '/storage/' . $filePath;
-        
-        // Create the video record
-        $scrollImage = ScrollImage::create([
-            'img_url' => $contentUrl,
-            'order' => $request->order
-        ]);
-        
-        return response()->json($scrollImage, 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::info("oops, we raised an error!");
+            Log::info($e->errors());
+            return response()->json([
+                'errors' => $e->errors()
+            ], 422);
+        }
     }
 
     /**
@@ -62,12 +74,12 @@ class ImageController extends Controller
         // Handle new file upload if provided
         if ($request->hasFile('img_file')) {
             // Delete old file
-            $oldFilePath = str_replace('storage/', 'public/', $scrollImage->content_url);
-            Storage::delete($oldFilePath);
+            $oldFilePath = str_replace('/storage/', '', $scrollImage->content_url);
+            Storage::disk('public')->delete($oldFilePath);
             
             // Store new file
             $filePath = $request->file('img_file')->store('aboutScroll', 'public');
-            $scrollImage->content_url = '/storage/' . $filePath;
+            $scrollImage->img_url = '/storage/' . $filePath;
         }
         
         // Update the other fields if provided
@@ -84,8 +96,8 @@ class ImageController extends Controller
     {
         $deletedOrder = $scrollImage->order;
 
-        $filePath = str_replace('/storage/', '', $scrollImage->img_url);
-        Storage::disk('public')->delete($filePath);
+        $oldFilePath = str_replace('/storage/', '', $scrollImage->content_url);
+        Storage::disk('public')->delete($oldFilePath);
         $scrollImage->delete();
 
         // Reorder all items that came after the deleted item

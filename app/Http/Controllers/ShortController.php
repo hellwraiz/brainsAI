@@ -88,8 +88,8 @@ class ShortController extends Controller
             // Handle new file upload if provided
             if ($request->isLocal && $reel->isLocal && $request->hasFile('video_file')) {
                 // Delete old file
-                $oldFilePath = str_replace('storage/', 'public/', $reel->content_url);
-                Storage::delete($oldFilePath);
+                $oldFilePath = str_replace('/storage/', '', $reel->content_url);
+                Storage::disk('public')->delete($oldFilePath);
                 
                 // Store new file
                 $filePath = $request->file('video_file')->store('content', 'public');
@@ -100,8 +100,8 @@ class ShortController extends Controller
                 $reel->content_url = '/storage/' . $filePath;
             } else if (! $request->isLocal && $reel->isLocal && $request->video_url) {
                 // Delete old file
-                $oldFilePath = str_replace('storage/', 'public/', $reel->content_url);
-                Storage::delete($oldFilePath);
+                $oldFilePath = str_replace('/storage/', '', $reel->content_url);
+                Storage::disk('public')->delete($oldFilePath);
                 
                 $reel->content_url = $request->video_url;
             } else if (! $request->isLocal && ! $reel->isLocal && $request->video_url) {

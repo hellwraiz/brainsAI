@@ -26,7 +26,7 @@ const editFormVid = reactive({
   file: null,
   file_url: ''
 })
-const editFormImg = ref({
+const editFormImg = reactive({
   id: null,
   order: 0,
   file: null
@@ -104,17 +104,17 @@ const changeOrder = async (obj, dir) => {
     })
     await updateVideo()
   } else {
-    editFormImg.value = {
+    Object.assign(editFormImg, {
       id: obj.id,
       order: obj1.order,
       file: null
-    }
+    })
     updateImage()
-    editFormImg.value = {
+    Object.assign(editFormImg, {
       id: obj1.id,
       order: obj.order,
       file: null
-    }
+    })
     updateImage()
   }
 
@@ -135,7 +135,11 @@ const createContent = () => {
     })
     showEditModalVid.value = true
   } else {
-    editFormImg.value = { id: null, order: content.images.length, file: null }
+    Object.assign(editFormImg, {
+      id: null,
+      order: content.images.length,
+      file: null
+    })
     showEditModalImg.value = true
   }
 }
@@ -155,11 +159,11 @@ const editContent = (content) => {
     })
     showEditModalVid.value = true
   } else {
-    editFormImg.value = {
+    Object.assign(editFormImg, {
       id: content.id,
       order: content.order,
       file: null
-    }
+    })
     showEditModalImg.value = true
   }
 }
@@ -169,15 +173,19 @@ const closeModal = () => {
   showEditModalImg.value = false
   isCreating.value = false
   Object.assign(editFormVid, { id: null, title: '', description: '', isVideo: true, isLocal:true, order: 0, file: null, file_url: null })
-  editFormImg.value = { id: null, order: 0, file: null }
+  Object.assign(editFormImg, { id: null, order: 0, file: null })
   uploadingFile.value = true
 }
 
 const handleFileChange = (event) => {
+  console.log("hello there!")
   if (activeTab.value === 'videos' || activeTab.value === 'shorts') {
     editFormVid.file = event.target.files[0]
   } else {
+    console.log("woah, this actually works????", event.target.files[0])
     editFormImg.file = event.target.files[0]
+    console.log(editFormImg)
+    console.log(editFormImg.file)
   }
 }
 
@@ -230,10 +238,10 @@ const updateImage = async () => {
 
   try {
     const formData = new FormData()
-    if (editFormImg.value.file) {
-      formData.append('img_file', editFormImg.value.file)
+    if (editFormImg.file) {
+      formData.append('img_file', editFormImg.file)
     }
-    formData.append('order', editFormImg.value.order)
+    formData.append('order', editFormImg.order)
 
     showEditModalImg.value = false
     
@@ -242,7 +250,7 @@ const updateImage = async () => {
         headers: { 'Content-Type': 'multipart/form-data'}
       })
     } else {
-      await axios.post(`/scrollImages/${editFormImg.value.id}?_method=PATCH`, formData, {
+      await axios.post(`/scrollImages/${editFormImg.id}?_method=PATCH`, formData, {
         headers: { 'Content-Type': 'multipart/form-data'}
       })
     }

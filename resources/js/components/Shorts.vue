@@ -35,18 +35,20 @@ const getColumnClass = (index) => {
     <div class="container">
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
-            <div @click="selectedVideo = video" v-for="(video, index) in videos" :key="index">
-                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" width="460px" :class="getColumnClass(index)" style="aspect-ratio: 9/16; object-fit: cover;"></video>
-                <img v-else :src="getVideoThumbnail(video.content_url)" width="460px" :class="getColumnClass(index)" style="aspect-ratio: 9/16; object-fit: cover;" alt="Video thumbnail">
+            <div @click="selectedVideo = video" :class="getColumnClass(index)" v-for="(video, index) in videos" :key="index">
+                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" width="460px" style="aspect-ratio: 9/16; object-fit: cover;"></video>
+                <img v-else :src="getVideoThumbnail(video.content_url)" width="460px" style="aspect-ratio: 9/16; object-fit: cover;" alt="Video thumbnail">
             </div>
         </div>
         <div class="video-display" >
-            <video @click="selectedVideo = video" v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" class="video-element"></video>
-            <img @click="selectedVideo = video" v-else :src="getVideoThumbnail(video.content_url)" class="video-element"alt="Video thumbnail">
+            <div class="video-container">
+                <video @click="selectedVideo = video" v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" class="video-element"></video>
+                <img @click="selectedVideo = video" v-else :src="getVideoThumbnail(video.content_url)" class="video-element"alt="Video thumbnail">
+            </div>
             <div class="listIndicators">
                 <button class="index-btn" @click="updateIndexMobile('l')"><img src="/public/images/arrowL.png" alt="left"></button>
                 <div class="flex gap-[10px]">
-                <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActiveB.png' : '/images/listItemB.png'"/>
+                    <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActiveB.png' : '/images/listItemB.png'"/>
                 </div>
                 <button class="index-btn" @click="updateIndexMobile('r')"><img src="/public/images/arrowR.png" alt="right"></button>
             </div>
@@ -73,6 +75,22 @@ const getColumnClass = (index) => {
     justify-items: center;
     padding-bottom: 120px;
 }
+.videoGrid div {
+    overflow: hidden;
+}
+.videoGrid video,
+.videoGrid img {
+    transition: all 0.3s ease
+}
+.videoGrid video:hover,
+.videoGrid img:hover {
+    transform: scale(1.25);
+}
+.videoGrid video.shifted:hover,
+.videoGrid img.shifted:hover {
+    transform: scale(1.25);
+    transform: translateY(214px);
+}
 
 .video-display {
     display: none;
@@ -94,12 +112,20 @@ const getColumnClass = (index) => {
 .index-btn:hover {
   opacity: 50%;
 }
+.video-container {
+    overflow: hidden;
+    width: 100%;
+    max-height: 573px;
+    margin-bottom: 40px
+}
 .video-element {
     object-fit: cover;
-    height: 573px;
+    aspect-ratio: 9/16;
     width: 100%;
-    overflow: hidden;
-    padding-bottom: 40px;
+    transition: all 0.3s ease;
+}
+.video-element:hover {
+    transform: scale(1.25);
 }
 
 .shift-down-120 {

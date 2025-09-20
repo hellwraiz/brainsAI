@@ -138,10 +138,10 @@ provide('embedUrl', embedUrl);
         </router-link>
         <img @click="ACTIVATETHEBURGER = true" width="32px" height="32px" :src="isHome ? '/images/icons/burgerW.svg' : '/images/icons/burgerB.svg'" alt="">
         <nav class="uppercase" :class="[isHome ? 'text-white' : 'text-black']">
-            <router-link to="/work">Work</router-link>
-            <router-link to="/shorts">Shorts</router-link>
-            <router-link to="/about">About</router-link>
-            <router-link to="/contact">Contact</router-link>
+            <router-link class="nav-link" :class="isHome ? 'after:bg-white' : 'after:bg-black'" to="/work">Work</router-link>
+            <router-link class="nav-link" :class="isHome ? 'after:bg-white' : 'after:bg-black'" to="/shorts">Shorts</router-link>
+            <router-link class="nav-link" :class="isHome ? 'after:bg-white' : 'after:bg-black'" to="/about">About</router-link>
+            <router-link class="nav-link" :class="isHome ? 'after:bg-white' : 'after:bg-black'" to="/contact">Contact</router-link>
         </nav>
     </header>
 
@@ -216,9 +216,39 @@ header > img {
 
 .container {
     justify-items: center;
-    margin: auto;
+    margin: 0px auto;
     padding: 0px 50px 50px;
     max-width: 1540px;
+}
+
+.nav-link {
+	font-size: 16px;
+	font-variation-settings: "wdth" 112.5;
+	font-weight: var(--font-weight-medium);
+	letter-spacing: .3px;
+	line-height: 18.4px;
+	overflow: hidden;
+	padding: 4px 0;
+	position: relative;
+	text-decoration: none;
+	text-transform: none;
+}
+.nav-link::after {
+	bottom: 0;
+	content: "";
+	height: 2px;
+	left: 0;
+	position: absolute;
+	transform: translateX(-101%);
+	transition: all ease 0.3s;
+	width: 100%;
+}
+.nav-link:focus::after, .nav-link:hover::after {
+	transform: translateX(0);
+}
+.nav-link.router-link-exact-active::after {
+	opacity: .2;
+	transform: translateX(0);
 }
 
 .burger-menu {
@@ -252,8 +282,8 @@ header > img {
 }
 
 /* Normal cursor everywhere */
-body, #app {
-  cursor: url('/public/images/icons/cursors/black.svg') 25 36.25, auto;
+body {
+  cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, auto;
 }
 
 /* Pointer cursor on clickable elements */
