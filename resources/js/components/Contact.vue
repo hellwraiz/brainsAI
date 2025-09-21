@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, onMounted, nextTick } from 'vue'
 import axios from 'axios'
 
 const form = reactive({
@@ -123,107 +123,120 @@ const handleSubmit = async () => {
     isValid.value = true
   }
 }
+
+const isEntering = ref(true);
+onMounted( async () => {
+  // To make sure that everything is loaded before starting the animation.
+  await nextTick();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      isEntering.value = false;
+    });
+  });
+})
+
 </script>
 
 <template>
-      <div class="container" >
-          <h1>TALK TO THE BRAINS BEHIND MOZGI. GOT A WILD IDEA? WE’VE GOT WILDER SOLUTIONS.</h1>
-          <div class="flex flex-col desktop:flex-row gap-[20px] desktop:gap-5">
-              <!-- Social Media Icons -->
-              <div class="flex gap-[18px]">
-                  <a href="https://www.tiktok.com/@mozgi.ai" class="social-link" aria-label="TikTok" target="_blank">
-                      <img src="/public/images/icons/tiktokicon.svg" width="24" height="24" alt="TikTok">
-                  </a>
-                  <a href="https://www.youtube.com/@MozgiAI" class="social-link" aria-label="YouTube" target="_blank">
-                      <img src="/public/images/icons/youtubeicon.svg" width="24" height="24" alt="YouTube">
-                  </a>
-                  <a href="https://www.instagram.com/mozgi.ai" class="social-link" aria-label="Instagram" target="_blank">
-                      <img src="/public/images/icons/instagramicon.svg" width="24"  height="24" alt="Instagram">
-                  </a>
-                  <a href="https://www.facebook.com/share/1BJLkktYki" class="social-link" aria-label="Facebook" target="_blank">
-                      <img src="/public/images/icons/facebookicon.svg" width="24" height="24" alt="Facebook">
-                  </a>
-              </div>
-  
-              <!-- Contact Info -->
-              <div class="flex flex-col desktop:flex-row gap-[20px] desktop:gap-10">
-                  <div class="flex flex-col">
-                      <span class="info-label">ADDRESS</span>
-                      <address class="info-value not-italic leading-none" >Carrer de Larrard, 20, Gràcia, 08012 Barcelona<br>1830 Radius Drive Hollywood, FL 33020</address>
-                  </div>
-                  <div class="flex flex-col">
-                      <span class="info-label">EMAIL</span>
-                      <a href="mailto:contact@mozgi.ai" class="info-value">contact@mozgi.ai</a>
-                  </div>
-              </div>
-          </div>
-          
+  <div class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
+    <h1>TALK TO THE BRAINS BEHIND MOZGI. GOT A WILD IDEA? WE’VE GOT WILDER SOLUTIONS.</h1>
+    <div class="flex flex-col desktop:flex-row gap-[20px] desktop:gap-5">
+      <!-- Social Media Icons -->
+      <div class="flex gap-[18px]">
+        <a href="https://www.tiktok.com/@mozgi.ai" class="social-link" aria-label="TikTok" target="_blank">
+          <img src="/public/images/icons/tiktokicon.svg" width="24" height="24" alt="TikTok">
+        </a>
+        <a href="https://www.youtube.com/@MozgiAI" class="social-link" aria-label="YouTube" target="_blank">
+          <img src="/public/images/icons/youtubeicon.svg" width="24" height="24" alt="YouTube">
+        </a>
+        <a href="https://www.instagram.com/mozgi.ai" class="social-link" aria-label="Instagram" target="_blank">
+          <img src="/public/images/icons/instagramicon.svg" width="24"  height="24" alt="Instagram">
+        </a>
+        <a href="https://www.facebook.com/share/1BJLkktYki" class="social-link" aria-label="Facebook" target="_blank">
+          <img src="/public/images/icons/facebookicon.svg" width="24" height="24" alt="Facebook">
+        </a>
       </div>
-  
-      <footer>
-          <div>
-              <h1>CONTACT US</h1>
-              <form @submit.prevent="handleSubmit" class="">
-                  <div class="contact-container">
-                      <div class="contact-form" >
-                          <div class="flex flex-col desktop:flex-row desktop:gap-[20px]">
-                              <div class="input-box-top">
-                                  <label for="name" class="input-label">Name</label>
-                                  <input id="name" v-model="form.name" type="text" class="input-field" :class="{ 'input-field-bad': errors.name }" placeholder="Your Name"/>
-                              </div>
-              
-                              <div class="input-box-top">
-                                  <label for="email" class="input-label">Email</label>
-                                  <input id="email" v-model="form.email" type="email" class="input-field" :class="{ 'input-field-bad': errors.email }" placeholder="Your Email"/>
-                              </div>
-              
-                              <div class="input-box-top">
-                                  <label for="phone" class="input-label">Phone</label>
-                                  <input id="phone" v-model="form.phone" type="tel" class="input-field" placeholder="Your Phone"/>
-                              </div>
-                          </div>
-          
-                          <div class="flex flex-col desktop:flex-row desktop:gap-[34px] items-center">
-                              <div class="w-full desktop:w-[660px] relative">
-                                  <label for="description" class="input-label">Description</label>
-                                  <textarea id="description" v-model="form.description" rows=1 class="mb-[24px] desktop:mb-0 input-field input-field--alt max-h-[120px]" :class="{ 'border-red-500': errors.description }" placeholder="Tell us about your project..."></textarea>
-                              </div>
-              
-                              <div class="flex flex-col self-stretch desktop:self-center ">
-                                  <label for="files" class="self-end cursor-pointer">
-                                    <img src="/public/images/send_materials.png" alt="Upload" class="w-[180px] hover:opacity-50">
-                                  </label>
-                                  <input id="files" class="hidden" @change="handleFileChange" type="file" multiple/>
-                                  
-                                  <!-- File List -->
-                                  <div v-if="selectedFiles.length > 0">
-                                  <div v-for="(file, index) in selectedFiles" :key="index" class=" text-white flex items-center py-[12px] gap-[10px] justify-between">
-                                    <img :src="getFileIcon(file.name)" class="w-10 h-10">
-                                    <div class="flex">
-                                      <span class="file-text">{{ file.name }}</span>
-                                      <button @click="removeFile(index)" type="button" class="w-[26px] p-[5px]">
-                                        <img class="close-img" src="/public/images/icons/close.svg" alt="">
-                                      </button>
-                                    </div>  
-                                  </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
+
+      <!-- Contact Info -->
+      <div class="flex flex-col desktop:flex-row gap-[20px] desktop:gap-10">
+        <div class="flex flex-col">
+          <span class="info-label">ADDRESS</span>
+          <address class="info-value not-italic leading-none" >Carrer de Larrard, 20, Gràcia, 08012 Barcelona<br>1830 Radius Drive Hollywood, FL 33020</address>
+        </div>
+        <div class="flex flex-col">
+          <span class="info-label">EMAIL</span>
+          <a href="mailto:contact@mozgi.ai" class="info-value">contact@mozgi.ai</a>
+        </div>
+      </div>
+    </div>
       
-                      <!-- Submit Button -->
-                      <button type="submit" :class="isValid ? '' : 'invalid'" :disabled="!isValid" class="form-submit-btn-desk">
-                        <img src="/public/images/send_laptop.png" alt="send">
-                      </button>
-                      <button type="submit" :class="isValid ? '' : 'invalid'" :disabled="!isValid" class="form-submit-btn" aria-label="Send request">
-                        <img width="36" height="36" src="/public/images/icons/send.svg" alt="send">
-                        <span>SEND A REQUEST</span>
-                      </button>
+  </div>
+  
+  <footer class="page-transition" :class="{ 'page-enter-from': isEntering }" >
+    <div>
+      <h1>CONTACT US</h1>
+      <form @submit.prevent="handleSubmit" class="">
+        <div class="contact-container">
+          <div class="contact-form" >
+            <div class="flex flex-col desktop:flex-row desktop:gap-[20px]">
+              <div class="input-box-top">
+                <label for="name" class="input-label">Name</label>
+                <input id="name" v-model="form.name" type="text" class="input-field" :class="{ 'input-field-bad': errors.name }" placeholder="Your Name"/>
+              </div>
+
+              <div class="input-box-top">
+                <label for="email" class="input-label">Email</label>
+                <input id="email" v-model="form.email" type="email" class="input-field" :class="{ 'input-field-bad': errors.email }" placeholder="Your Email"/>
+              </div>
+
+              <div class="input-box-top">
+                <label for="phone" class="input-label">Phone</label>
+                <input id="phone" v-model="form.phone" type="tel" class="input-field" placeholder="Your Phone"/>
+              </div>
+            </div>
+
+              <div class="flex flex-col desktop:flex-row desktop:gap-[34px] items-center">
+                <div class="w-full desktop:w-[660px] relative">
+                  <label for="description" class="input-label">Description</label>
+                  <textarea id="description" v-model="form.description" rows=1 class="mb-[24px] desktop:mb-0 input-field input-field--alt max-h-[120px]" :class="{ 'border-red-500': errors.description }" placeholder="Tell us about your project..."></textarea>
+                </div>
+
+                <div class="flex flex-col self-stretch desktop:self-center ">
+                  <label for="files" class="self-end cursor-pointer">
+                    <img src="/public/images/send_materials.png" alt="Upload" class="w-[180px] hover:opacity-50">
+                  </label>
+                  <input id="files" class="hidden" @change="handleFileChange" type="file" multiple/>
+                  
+                  <!-- File List -->
+                  <div v-if="selectedFiles.length > 0">
+                    <div v-for="(file, index) in selectedFiles" :key="index" class=" text-white flex items-center py-[12px] gap-[10px] justify-between">
+                      <img :src="getFileIcon(file.name)" class="w-10 h-10">
+                      <div class="flex">
+                        <span class="file-text">{{ file.name }}</span>
+                        <button @click="removeFile(index)" type="button" class="w-[26px] p-[5px]">
+                          <img class="close-img" src="/public/images/icons/close.svg" alt="">
+                        </button>
+                      </div>  
+                    </div>
                   </div>
-                  <div id="form-messages" :class="isValid ? 'success' : 'failure'" class="form-messages">{{ message }}</div>
-              </form>
+                </div>
+              </div>
           </div>
-      </footer>
+
+          <!-- Submit Button -->
+          <button type="submit" :class="isValid ? '' : 'invalid'" :disabled="!isValid" class="form-submit-btn-desk">
+            <img src="/public/images/send_laptop.png" alt="send">
+          </button>
+          <button type="submit" :class="isValid ? '' : 'invalid'" :disabled="!isValid" class="form-submit-btn" aria-label="Send request">
+            <img width="36" height="36" src="/public/images/icons/send.svg" alt="send">
+            <span>SEND A REQUEST</span>
+          </button>
+        </div>
+        <div id="form-messages" :class="isValid ? 'success' : 'failure'" class="form-messages">{{ message }}</div>
+      </form>
+    </div>
+  </footer>
 </template>
 
 <style scoped>

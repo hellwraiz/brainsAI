@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, inject, computed } from 'vue';
+import { ref, inject, computed, onMounted, nextTick } from 'vue';
 import VideoModal from './VideoModal.vue';
 
 const isHovered = ref(false);
@@ -29,10 +29,23 @@ const getColumnClass = (index) => {
     return ''; // column 2, no shift
 };
 
+const isEntering = ref(true);
+onMounted( async () => {
+
+    // To make sure that everything is loaded before starting the animation.
+    await nextTick();
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            isEntering.value = false;
+        });
+    });
+})
+
 </script>
 
 <template>
-    <div class="container">
+    <div class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div @click="selectedVideo = video" :class="getColumnClass(index)" v-for="(video, index) in videos" :key="index">

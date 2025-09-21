@@ -7,6 +7,8 @@ import Contact from '../components/Contact.vue'
 import Login from '../components/Login.vue'
 import Admin from '../components/Admin.vue'
 
+let isTransitioning = false;
+
 const routes = [
   { path: '/', component: Home },
   { path: '/work', component: Work },
@@ -40,8 +42,27 @@ router.beforeEach(async (to, from, next) => {
       next('/loginAdmin') // You'll need a login page
     }
   } else {
-    next() // No auth required, proceed
+    if (isTransitioning || !from.href) {
+      next();
+      return;
+    }
+    
+    isTransitioning = true;
+    
+    const pageElements = document.querySelectorAll('.page-transition');
+    pageElements.forEach(el => {
+      el.classList.add('page-leave-active', 'page-leave-to');
+    });
+
+    const duration = parseFloat('0' + getComputedStyle(document.documentElement).getPropertyValue('--transition-duration').slice(0,-1));
+    
+    await new Promise(resolve => setTimeout(resolve, duration * 800));
+
+    
+    isTransitioning = false;
+    next()
   }
 })
+
 
 export default router

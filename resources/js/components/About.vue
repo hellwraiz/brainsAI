@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, inject } from 'vue';
+import { computed, inject, onMounted, ref, nextTick } from 'vue';
 
 const content = inject('content');
 const images = computed (() => content.images.length ? content.images.map(img => img.img_url) : ['/storage/aboutScroll/placeholder.jpg']);
@@ -16,13 +16,24 @@ const duplicatedImages = computed (() => {
 const halfwayPoint = - (duplicatedImages.value.length / 2) * 191;
 
 const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
+const isEntering = ref(true);
+
+onMounted(async () => {
+
+    // To make sure that everything is loaded before starting the animation.
+    await nextTick();
+
+  requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            isEntering.value = false;
+        });
+  });
+})
 
 </script>
 
 <template>
-    <div>
-
-    <div class="container pb-[150px] desktop:pb-0" >
+    <div class="container pb-[150px] desktop:pb-0 page-transition" :class="{ 'page-enter-from': isEntering }" >
         <h1>CREATIVITY WITHOUT BORDERS. CONTENT THAT CAPTIVATES, INSPIRES, AND REFUSES TO BE IGNORED.</h1>
         <div>
             <p style="flex: 2;">
@@ -40,12 +51,11 @@ const timePerLoop = (duplicatedImages.value.length) * 1.75; // seconds
         </div>
     </div>
 
-    <div class="scrolling-container"
+    <div class="scrolling-container page-transition" :class="{ 'page-enter-from': isEntering }"
     :style="{ '--halfway-point': halfwayPoint + 'px', '--time-per-loop': timePerLoop + 's' }">
         <div class="scrolling-content">
             <img v-for="(img, index) in duplicatedImages" :class="index % 2 === 0 ? '' : 'evenImage'" :key="index" :src="img" />
         </div>
-    </div>
     </div>
 </template>
 

@@ -172,7 +172,7 @@ provide('embedUrl', embedUrl);
         </div>
     </div>
 
-    <router-view></router-view>
+    <router-view />
 </template>
 
 <style>
@@ -301,6 +301,25 @@ a, button, img, video, iframe, footer, .clickable {
 
 .neutral-cursor {
     cursor: url('/public/images/icons/cursors/neutral.svg') 25 36.25, pointer;
+}
+
+
+.page-transition {
+  transition: opacity var(--transition-duration) ease, transform var(--transition-duration) ease;
+}
+
+.page-leave-active {
+  transition: opacity var(--transition-duration) ease, transform var(--transition-duration) ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 @media (max-width: 1440px) {

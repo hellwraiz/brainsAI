@@ -1,9 +1,8 @@
 <script setup>
 
-import { ref, inject, computed } from 'vue';
+import { ref, inject, computed, onMounted, nextTick } from 'vue';
 import VideoModal from './VideoModal.vue';
 
-const isHovered = ref(false);
 
 const content = inject('content');
 const getVideoThumbnail = inject('getVideoThumbnail')
@@ -11,10 +10,23 @@ const videos = computed (() => content.videos);
 
 const selectedVideo = ref(null);
 
+const isEntering = ref(true);
+onMounted( async () => {
+
+    // To make sure that everything is loaded before starting the animation.
+    await nextTick();
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            isEntering.value = false;
+        });
+    });
+})
+
 </script>
 
 <template>
-    <div v-if="!selectedVideo" class="container">
+    <div v-if="!selectedVideo" class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div @click="selectedVideo = video" :class="index % 2 === 1 ? 'shifted' : ''" v-for="(video, index) in videos" :key="index">

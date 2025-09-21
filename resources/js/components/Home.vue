@@ -1,12 +1,14 @@
 <script setup>
-import { ref, inject, computed, onMounted, onUnmounted, watch, reactive } from 'vue';
+import { ref, inject, computed, onMounted, onUnmounted, watch, reactive, nextTick } from 'vue';
 import VideoModal from './VideoModal.vue';
+
 const index = ref(0);
 
 const content = inject('content');
 const length = computed(() => content.videos.length);
 const video = computed(() => length ? content.videos[index.value] : null);
 const aspectRatio = ref(false)
+
 
 function getId() {
   if (length.value > 0) {
@@ -38,6 +40,7 @@ function getId() {
   }
   return ''
 }
+
 const selectedVideo = ref(null);
 const videoStreamUrl = computed(() => `/videos/${video.value.id}/stream`)
 
@@ -70,10 +73,21 @@ const updateIndexMobile = ((dir) => {
 
 const updateAspectRatio = (() => (aspectRatio.value = ((window.innerWidth/16)/(window.innerHeight/9))>=1))
 
-onMounted(() => {
+const isEntering = ref(true);
+
+onMounted(async () => {
   window.addEventListener('wheel', handleScroll, {passive: false});
   window.addEventListener('resize', updateAspectRatio)
   aspectRatio.value = ((window.innerWidth/16)/(window.innerHeight/9))>=1
+  
+  // To make sure that everything is loaded before starting the animation.
+  await nextTick();
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      isEntering.value = false;
+    });
+  });
 });
 
 onUnmounted(() => {
@@ -119,12 +133,12 @@ const embedUrl = inject('embedUrl')
 
 <template>
   <div v-if="length > 0">
-    <video v-if="video.isLocal === 'true'" class="video-iframe fixed min-w-screen min-h-screen" :key="videoStreamUrl" :src="videoStreamUrl" preload="metadata" autoplay muted loop playsinline ></video>
-    <iframe v-else-if="aspectRatio" class="video-iframe fixed w-screen" :src="embedUrl(video.content_url, YtParams, VmParams)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-    <div v-else class="iframe-container">
+    <video v-if="video.isLocal === 'true'" class="video-iframe fixed min-w-screen min-h-screen page-transition" :key="videoStreamUrl" :src="videoStreamUrl" preload="metadata" autoplay muted loop playsinline :class="{ 'page-enter-from': isEntering }" ></video>
+    <iframe v-else-if="aspectRatio" class="video-iframe fixed w-screen page-transition" :src="embedUrl(video.content_url, YtParams, VmParams)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" :class="{ 'page-enter-from': isEntering }" ></iframe>
+    <div v-else class="iframe-container page-transition" :class="{ 'page-enter-from': isEntering }" >
       <iframe class="video-iframe h-screen" :src="embedUrl(video.content_url, YtParams, VmParams)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
     </div>
-    <div class="videoElements">
+    <div class="videoElements page-transition" :class="{ 'page-enter-from': isEntering }" >
       <div class="videoText">
         <h1>{{ video.title }}</h1>
         <h2>{{ video.description }}</h2>
@@ -153,7 +167,6 @@ const embedUrl = inject('embedUrl')
 
 <style scoped>
 
-/* Normal cursor everywhere */
 video {
   cursor: url('/public/images/icons/cursors/white.svg') 25 36.25, auto !important;
 }
