@@ -6,19 +6,38 @@ import VideoModal from './VideoModal.vue';
 const isHovered = ref(false);
 
 const content = inject('content');
-const getVideoThumbnail = inject('getVideoThumbnail')
 const videos = computed (() => content.shorts);
 const length = computed(() => content.shorts.length);
 const video = computed(() => length ? content.shorts[index.value] : null);
 const index = ref(0);
 
-const updateIndexMobile = ((dir) => {
-  if (dir === 'r') {
-    index.value = (index.value + 1) % length.value;
-  } else if (dir === 'l') {
-    index.value = (index.value - 1 + length.value) % length.value;
-  }
-})
+const showNext = ref(null)
+const isAnimating = ref(false)
+const currentFrame = ref(null)
+const updateIndexMobile = async (dir) => {
+
+    if (isAnimating.value) return
+    
+    currentFrame.value = video.value.img_url;
+
+    if (dir === 'r') {
+        showNext.value = true;
+        index.value = (index.value + 1) % length.value;
+    } else if (dir === 'l') {
+        showNext.value = false;
+        index.value = (index.value - 1 + length.value) % length.value;
+    }
+
+    setTimeout(() => {
+        isAnimating.value = true;
+    }, 5)
+
+    setTimeout(() => {
+        showNext.value = null
+        isAnimating.value = false
+        currentFrame.value = false
+    }, 1000)
+}
 
 const selectedVideo = ref(null);
 
@@ -47,14 +66,21 @@ onMounted( async () => {
 <template>
     <div class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
-        <div class="videoGrid">
+        <div v-if="length > 0" class="videoGrid">
             <div @click="selectedVideo = video" :class="getColumnClass(index)" v-for="(video, index) in videos" :key="index">
                 <img :src="video.img_url" width="460px" style="aspect-ratio: 9/16; object-fit: cover;"/>
             </div>
         </div>
-        <div class="video-display" >
+        <div v-if="length > 0" class="video-display" >
             <div class="video-container">
-                <img @click="selectedVideo = video" :src="video.img_url" class="video-element"/>
+                <!-- To make the animation work I need to cover 2 situations -->
+                <!-- Right: Dulicate the current frame, then duplicate the next one over it, and slide it onto the current one from the right -->
+                <!-- Left: Duplicate current frame, and slide it to the right out of existance-->
+                <img v-if="showNext" :src="video.img_url" :class="isAnimating && showNext ? 'go-left' : 'stay-right'" class="video-animation z-10"/>
+                <img v-if="currentFrame" :src="currentFrame" :class="showNext ? (isAnimating ? 'scale' : '') : (isAnimating ? 'stay-right' : '')" class="video-animation z-9">
+                <img @click="selectedVideo = video" :src="video.img_url" :class="!isAnimating && showNext === false ? 'scale-main' : (isAnimating && showNext === false ? 'scale-down' : '')" class="video-element"/>
+                <!--
+                -->
             </div>
             <div class="listIndicators">
                 <button class="index-btn" @click="updateIndexMobile('l')"><img src="/public/images/arrowL.png" alt="left"></button>
@@ -124,21 +150,45 @@ onMounted( async () => {
   opacity: 50%;
 }
 .video-container {
+    position: relative;
     overflow: hidden;
     width: 100%;
+    aspect-ratio: 9/16;
     max-height: 573px;
     margin-bottom: 40px
 }
+.video-animation,
 .video-element {
+    position: absolute;
     object-fit: cover;
     aspect-ratio: 9/16;
     width: 100%;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .video-element:hover {
     transform: scale(1.25);
 }
-
+.video-animation {
+    transition: 1000ms 
+}
+.stay-right {
+    transform: translateX(100%);
+}
+.scale {
+    transition: all 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1.25);
+}
+.scale-main {
+    transition: all 0ms;
+    transform: scale(1.25);
+}
+.scale-down {
+    transition: all 1000ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
+}
+.go-left {
+    transform: translateX(0)
+}
 .shift-down-120 {
   transform: translateY(120px);
 }
