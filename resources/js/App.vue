@@ -29,7 +29,7 @@ onMounted(async () => {
 
 provide('content', content);
 
-// Functions for handling video thumbnails
+// Functions for handling iframe video thumbnails
 const getVideoThumbnail = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) {
         let id;
@@ -44,8 +44,7 @@ const getVideoThumbnail = (url) => {
             }
     
             if (id) {
-                // hqdefault.jpg (480x360) - high quality, always available
-                return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+                return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
             }
         } catch (error) {
     console.error('Error extracting YouTube thumbnail:', error);

@@ -49,7 +49,7 @@ onMounted( async () => {
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div @click="selectedVideo = video" :class="getColumnClass(index)" v-for="(video, index) in videos" :key="index">
-                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" width="460px" style="aspect-ratio: 9/16; object-fit: cover;"></video>
+                <video  v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" width="460px" style="aspect-ratio: 9/16; object-fit: cover;"></video>
                 <img v-else :src="getVideoThumbnail(video.content_url)" width="460px" style="aspect-ratio: 9/16; object-fit: cover;" alt="Video thumbnail">
             </div>
         </div>
@@ -61,7 +61,7 @@ onMounted( async () => {
             <div class="listIndicators">
                 <button class="index-btn" @click="updateIndexMobile('l')"><img src="/public/images/arrowL.png" alt="left"></button>
                 <div class="flex gap-[10px]">
-                    <img v-for="(_, itemIndex) in content.videos" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActiveB.png' : '/images/listItemB.png'"/>
+                    <img v-for="(_, itemIndex) in content.shorts" :key="itemIndex" :src="itemIndex === index ? '/images/listItemActiveB.png' : '/images/listItemB.png'"/>
                 </div>
                 <button class="index-btn" @click="updateIndexMobile('r')"><img src="/public/images/arrowR.png" alt="right"></button>
             </div>
