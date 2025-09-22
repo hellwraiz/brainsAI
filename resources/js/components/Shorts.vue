@@ -67,20 +67,21 @@ onMounted( async () => {
     <div class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div v-if="length > 0" class="videoGrid">
-            <div @click="selectedVideo = video" :class="getColumnClass(index)" v-for="(video, index) in videos" :key="index">
+            <div class="relative" @click="selectedVideo = video" :class="getColumnClass(index)" v-for="(video, index) in videos" :key="index">
                 <img :src="video.img_url" width="460px" style="aspect-ratio: 9/16; object-fit: cover;"/>
+                <div class="work-overlay">
+                    <span class="work-label">{{ video.title }}</span>
+                </div>
             </div>
         </div>
         <div v-if="length > 0" class="video-display" >
             <div class="video-container">
-                <!-- To make the animation work I need to cover 2 situations -->
-                <!-- Right: Dulicate the current frame, then duplicate the next one over it, and slide it onto the current one from the right -->
-                <!-- Left: Duplicate current frame, and slide it to the right out of existance-->
                 <img v-if="showNext" :src="video.img_url" :class="isAnimating && showNext ? 'go-left' : 'stay-right'" class="video-animation z-10"/>
                 <img v-if="currentFrame" :src="currentFrame" :class="showNext ? (isAnimating ? 'scale' : '') : (isAnimating ? 'stay-right' : '')" class="video-animation z-9">
                 <img @click="selectedVideo = video" :src="video.img_url" :class="!isAnimating && showNext === false ? 'scale-main' : (isAnimating && showNext === false ? 'scale-down' : '')" class="video-element"/>
-                <!--
-                -->
+                <div class="work-overlay">
+                    <span class="work-label">{{ video.title }}</span>
+                </div>
             </div>
             <div class="listIndicators">
                 <button class="index-btn" @click="updateIndexMobile('l')"><img src="/public/images/arrowL.png" alt="left"></button>
@@ -103,8 +104,12 @@ onMounted( async () => {
 </template>
 
 
-<style scoped>
-    
+<style scoped>   
+/* Pointer cursor on clickable elements */
+span {
+  cursor: url('/public/images/icons/cursors/neutral.svg') 25 36.25, pointer;
+}
+
 .videoGrid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -115,18 +120,40 @@ onMounted( async () => {
 .videoGrid div {
     overflow: hidden;
 }
-.videoGrid video,
 .videoGrid img {
     transition: all 0.3s ease
 }
-.videoGrid video:hover,
-.videoGrid img:hover {
+.videoGrid > div:hover img {
     transform: scale(1.25);
 }
-.videoGrid video.shifted:hover,
-.videoGrid img.shifted:hover {
+.video-container:hover img {
     transform: scale(1.25);
-    transform: translateY(214px);
+}
+.video-container:hover span {
+    text-decoration: underline;
+}
+.videoGrid > div:hover span {
+    text-decoration: underline;
+}
+.work-overlay {
+	background: linear-gradient(transparent,rgba(0,0,0,.7));
+	bottom: 0;
+	left: 0;
+	padding: 40px;
+	position: absolute;
+	right: 0;
+}
+.work-label {
+    max-width: 300px;
+	color: white;
+	display: block;
+	font-size: 20px;
+    line-height: 1.4;
+	font-variation-settings: "wdth" 125;
+	font-weight: 700;
+	line-height: 1;
+	text-transform: uppercase;
+	transition: all 0.3s ease;
 }
 
 .video-display {
@@ -160,13 +187,12 @@ onMounted( async () => {
 .video-animation,
 .video-element {
     position: absolute;
+    inset: 0;
+    margin: auto;
     object-fit: cover;
     aspect-ratio: 9/16;
     width: 100%;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.video-element:hover {
-    transform: scale(1.25);
 }
 .video-animation {
     transition: 1000ms 
@@ -221,6 +247,16 @@ onMounted( async () => {
 
     .videoGrid {
         display: none;
+    }
+
+    .work-overlay {
+        padding: 20px;
+    }
+    .work-label {
+        max-width: 218px;
+        font-size: 14px;
+        line-height: 1;
+        font-size: 14px;
     }
 
     .video-display {

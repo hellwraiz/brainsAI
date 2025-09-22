@@ -5,7 +5,6 @@ import VideoModal from './VideoModal.vue';
 
 
 const content = inject('content');
-const getVideoThumbnail = inject('getVideoThumbnail')
 const videos = computed (() => content.videos);
 
 const selectedVideo = ref(null);
@@ -29,8 +28,11 @@ onMounted( async () => {
     <div v-if="!selectedVideo" class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
-            <div @click="selectedVideo = video" :class="index % 2 === 1 ? 'shifted' : ''" v-for="(video, index) in videos" :key="index">
+            <div class="relative" @click="selectedVideo = video" :class="index % 2 === 1 ? 'shifted' : ''" v-for="(video, index) in videos" :key="index">
                 <img :src="video.img_url" class="w-full desktop:w-[704px] aspect-16/9 object-cover"></img>
+                <div class="work-overlay">
+                    <span class="work-label">{{ video.title }}</span>
+                </div>
             </div>
             <a href="/contact" :class="videos.length % 2 == 1 ? 'shifted' : ''">
                 <img src="/public/images/contactUs.png" class="hover:opacity-80" alt="contact button"/>
@@ -46,6 +48,11 @@ onMounted( async () => {
 
 
 <style scoped>
+/* Pointer cursor on clickable elements */
+span {
+  cursor: url('/public/images/icons/cursors/neutral.svg') 25 36.25, pointer;
+}
+
 .videoGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -65,21 +72,39 @@ onMounted( async () => {
 .videoGrid div {
     overflow: hidden;
 }
-.videoGrid video,
 .videoGrid img {
     transition: all 0.3s ease
 }
-.videoGrid > div > video:hover,
-.videoGrid > div > img:hover {
+.videoGrid > div:hover span {
+    text-decoration: underline;
+}
+.videoGrid > div:hover > img {
     transform: scale(1.25);
 }
-.videoGrid video.shifted:hover,
-.videoGrid img.shifted:hover {
-    transform: scale(1.25);
+.videoGrid > div:hover span {
+    text-decoration: underline;
+}
+.videoGrid > div > img.shifted {
     transform: translateY(214px);
 }
-.videoGrid:last-child:hover {
-    transform: scale(1);
+.work-overlay {
+	background: linear-gradient(transparent,rgba(0,0,0,.7));
+	bottom: 0;
+	left: 0;
+	padding: 40px;
+	position: absolute;
+	right: 0;
+}
+.work-label {
+    max-width: 347px;
+	color: white;
+	display: block;
+	font-size: 20px;
+	font-variation-settings: "wdth" 125;
+	font-weight: 700;
+	line-height: 1;
+	text-transform: uppercase;
+	transition: all 0.3s ease;
 }
 
 .container > h1 {
@@ -123,6 +148,14 @@ onMounted( async () => {
 
 .videoGrid > a {
     display: none;
+}
+
+.work-overlay {
+    padding: 20px;
+}
+.work-label {
+    max-width: 230px;
+    font-size: 14px;
 }
 
 .container > a {
