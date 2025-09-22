@@ -32,13 +32,18 @@ class VideoController extends Controller
                 'isLocal' => 'required|in:true,false',
                 'video_file' => 'required_if:isLocal,true|file|mimes:mp4,mov,avi|max:51200', // 50MB max
                 'video_url' => 'required_unless:isLocal,true|url|max:511',
+                'image_file' => 'required_if:isLocal,true|file|mimes:jpeg,png',
+                'image_url' => 'required_unless:isLocal,true|url',
                 'order' => 'required|integer'
             ]);
             if ($request->isLocal === 'true') {
                 $filePath = $request->file('video_file')->store('content', 'public');
                 $contentUrl = '/storage/' . $filePath;
+                $imgUrl = $request->file('image_file')->store('content', 'public');
+                $imageUrl = '/storage/' . $imgUrl;
             } else {
                 $contentUrl = $request->video_url;
+                $imageUrl = $request->image_url;
             }
             // Create the video record
             $video = Content::create([
@@ -47,6 +52,7 @@ class VideoController extends Controller
                 'isVideo' => $request->isVideo,
                 'isLocal' => $request->isLocal,
                 'content_url' => $contentUrl,
+                'img_url' => $imageUrl,
                 'order' => $request->order
             ]);
             return response()->json($video, 201);
@@ -79,6 +85,8 @@ class VideoController extends Controller
                 'isLocal' => 'required|in:true,false',
                 'video_file' => 'sometimes|required_if:isLocal,true|file|mimes:mp4,mov,avi|max:51200', // 50MB max
                 'video_url' => 'sometimes|required_unless:isLocal,true|url|max:511',
+                'image_file' => 'sometimes|required_if:isLocal,true|file|mimes:jpeg,png',
+                'image_url' => 'sometimes|required_unless:isLocal,true|url',
                 'order' => 'required|integer'
             ]);
             
@@ -91,18 +99,39 @@ class VideoController extends Controller
                 // Store new file
                 $filePath = $request->file('video_file')->store('content', 'public');
                 $video->content_url = '/storage/' . $filePath;
+
+                // Delete old image
+                $oldImgPath = str_replace('/storage/', '', $video->img_url);
+                Storage::disk('public')->delete($oldImgPath);
+
+                // Store new image
+                $imgPath = $request->file('img_file')->store('content', 'public');
+                $video->img_url = '/storage/' . $imgPath;
+
             } else if ($request->isLocal && ! $video->isLocal && $request->hasFile('video_file')) {
                 // Store new file
                 $filePath = $request->file('video_file')->store('content', 'public');
                 $video->content_url = '/storage/' . $filePath;
+
+                // Store new image
+                $imgPath = $request->file('img_file')->store('content', 'public');
+                $video->img_url = '/storage/' . $imgPath;
+
             } else if (! $request->isLocal && $video->isLocal && $request->video_url) {
                 // Delete old file
                 $oldFilePath = str_replace('/storage/', '', $video->content_url);
                 Storage::disk('public')->delete($oldFilePath);
+
+                // Delete old image
+                $oldImgPath = str_replace('/storage/', '', $video->img_url);
+                Storage::disk('public')->delete($oldImgPath);
                 
                 $video->content_url = $request->video_url;
+                $video->img_url = $request->image_url;
+
             } else if (! $request->isLocal && ! $video->isLocal && $request->video_url) {
                 $video->content_url = $request->video_url;
+                $video->img_url = $request->image_url;
             }
             
             // Update the other fields if provided
@@ -128,6 +157,8 @@ class VideoController extends Controller
         if ($video->isLocal && $video->content_url) {
             $filePath = str_replace('/storage/', '', $video->content_url);
             Storage::disk('public')->delete($filePath);
+            $imgPath = str_replace('/storage', '', $video->img_url);
+            Storage::disk('public')->delete($imgPath);
         }
         $video->delete();
 

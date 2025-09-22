@@ -7,6 +7,8 @@ import axios from 'axios'
 
 
 const content = inject('content');
+const extractFirstFrame = inject('extractFirstFrame');
+const getVideoThumbnail = inject('getVideoThumbnail');
 
 const router = useRouter()
 const user = ref(null)
@@ -24,7 +26,9 @@ const editFormVid = reactive({
   isLocal: true,
   order: 0,
   file: null,
-  file_url: ''
+  file_url: '',
+  img: null,
+  img_url: ''
 })
 const editFormImg = reactive({
   id: null,
@@ -85,11 +89,10 @@ const changeOrder = async (obj, dir) => {
       isLocal: obj.isLocal === 'true',
       order: obj1.order,
       file: null,
-      file_url: ''
+      file_url: '',
+      img: null,
+      img_url: ''
     })
-    console.log("what the actual fuck...", obj)
-    console.log("what the actual fuck...", editFormVid)
-    console.log(obj1.order)
     await updateVideo()
     uploadingFile.value = obj1.isLocal
     Object.assign(editFormVid, {
@@ -100,7 +103,9 @@ const changeOrder = async (obj, dir) => {
       isLocal: obj1.isLocal === 'true',
       order: obj.order,
       file: null,
-      file_url: ''
+      file_url: '',
+      img: null,
+      img_url: ''
     })
     await updateVideo()
   } else {
@@ -131,7 +136,9 @@ const createContent = () => {
       isLocal: uploadingFile.value,
       order: content[activeTab.value].length,
       file: null,
-      file_url: ''
+      file_url: '',
+      img: null,
+      img_url: ''
     })
     showEditModalVid.value = true
   } else {
@@ -155,7 +162,9 @@ const editContent = (content) => {
       isLocal: uploadingFile.value,
       order: content.order,
       file: null,
-      file_url: null
+      file_url: null,
+      img: null,
+      img_url: null
     })
     showEditModalVid.value = true
   } else {
@@ -172,20 +181,17 @@ const closeModal = () => {
   showEditModalVid.value = false
   showEditModalImg.value = false
   isCreating.value = false
-  Object.assign(editFormVid, { id: null, title: '', description: '', isVideo: true, isLocal:true, order: 0, file: null, file_url: null })
+  Object.assign(editFormVid, { id: null, title: '', description: '', isVideo: true, isLocal:true, order: 0, file: null, file_url: '', img: null, img_url: '' })
   Object.assign(editFormImg, { id: null, order: 0, file: null })
   uploadingFile.value = true
 }
 
-const handleFileChange = (event) => {
-  console.log("hello there!")
+const handleFileChange = async (event) => {
   if (activeTab.value === 'videos' || activeTab.value === 'shorts') {
     editFormVid.file = event.target.files[0]
+    editFormVid.img = await extractFirstFrame(event.target.files[0])
   } else {
-    console.log("woah, this actually works????", event.target.files[0])
     editFormImg.file = event.target.files[0]
-    console.log(editFormImg)
-    console.log(editFormImg.file)
   }
 }
 
@@ -198,9 +204,13 @@ const updateVideo = async () => {
     formData.append('isVideo', editFormVid.isVideo)
     formData.append('isLocal', editFormVid.isLocal)
     if (uploadingFile.value && editFormVid.file) {
+      console.log(editFormVid.file)
+      console.log(editFormVid.img)
       formData.append('video_file', editFormVid.file)
+      formData.append('image_file', editFormVid.img)
     } else if (!uploadingFile.value && editFormVid.file_url) {
       formData.append('video_url', editFormVid.file_url)
+      formData.append('image_url', getVideoThumbnail(editFormVid.file_url))
     }
     formData.append('order', editFormVid.order)
 

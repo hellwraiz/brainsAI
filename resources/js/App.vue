@@ -29,6 +29,29 @@ onMounted(async () => {
 
 provide('content', content);
 
+const extractFirstFrame = async (videoFile) => {
+  const video = document.createElement('video')
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  
+  return new Promise((resolve) => {
+    video.onloadeddata = () => {
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      ctx.drawImage(video, 0, 0)
+      
+      canvas.toBlob((blob) => {
+        const thumbnailFile = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' })
+        resolve(thumbnailFile)
+      }, 'image/jpeg', 0.8)
+    };
+    
+    video.src = URL.createObjectURL(videoFile)
+  });
+}
+
+provide('extractFirstFrame', extractFirstFrame)
+
 // Functions for handling iframe video thumbnails
 const getVideoThumbnail = (url) => {
     if (url.includes('youtube.com') || url.includes('youtu.be')) {

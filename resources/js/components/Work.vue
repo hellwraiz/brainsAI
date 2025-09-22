@@ -30,8 +30,7 @@ onMounted( async () => {
         <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
         <div class="videoGrid">
             <div @click="selectedVideo = video" :class="index % 2 === 1 ? 'shifted' : ''" v-for="(video, index) in videos" :key="index">
-                <video v-if="video.isLocal === 'true'" preload="metadata" :src="`/videos/${video.id}/stream`" class="w-full desktop:w-[704px] aspect-16/9 object-cover"></video>
-                <img v-else :src="getVideoThumbnail(video.content_url)" class="w-full desktop:w-[704px] aspect-16/9 object-cover" alt="Video thumbnail">
+                <img :src="video.img_url" class="w-full desktop:w-[704px] aspect-16/9 object-cover"></img>
             </div>
             <a href="/contact" :class="videos.length % 2 == 1 ? 'shifted' : ''">
                 <img src="/public/images/contactUs.png" class="hover:opacity-80" alt="contact button"/>

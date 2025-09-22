@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('content_url');
             $table->string('isVideo');
             $table->string('isLocal');
+            $table->string('img_url');
             $table->integer('order');
             $table->timestamps();
         });
