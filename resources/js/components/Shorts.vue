@@ -65,7 +65,8 @@ onMounted( async () => {
 
 <template>
     <div class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
-        <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
+        <h1>{{ content.text['shorts title']}}</h1>
+        <p>{{ content.text['shorts desc'] }}</p> 
         <div v-if="length > 0" class="videoGrid">
             <div class="relative" @click="selectedVideo = video" :class="getColumnClass(index)" v-for="(video, index) in videos" :key="index">
                 <img :src="video.img_url" width="460px" style="aspect-ratio: 9/16; object-fit: cover;"/>
@@ -225,14 +226,17 @@ span {
 
 .container > h1 {
     font-weight: 900;
-    margin: 50px 0 50px;
-    width: 60%;
+    margin: 36px 0 20px;
+    width: 65%;
 	font-size: 34px;
 	font-variation-settings: "wdth" 125;
 	font-weight: var(--font-weight-bold);
 	letter-spacing: 0;
 	line-height: 1;
 	text-transform: uppercase;
+}
+.container > p {
+    margin-bottom: 70px;
 }
 
 .container > a {

@@ -39,7 +39,8 @@ const editFormImg = reactive({
 const tabs = [
   { id: 'videos', label: 'Videos' },
   { id: 'shorts', label: 'Shorts' },
-  { id: 'images', label: 'Scroll Images' }
+  { id: 'images', label: 'Scroll Images' },
+  { id: 'text', label: 'Page Text'}
 ]
 
 function fetchVideos() {
@@ -356,6 +357,33 @@ const embedUrl = inject('embedUrl')
             <button @click="editContent(image)" class="bg-[#007bff] text-white btn">Edit</button>
             <button @click="deleteContent(image.id)" class="bg-[#dc3545] text-white btn">Delete</button>
           </div>
+        </div>
+      </div>
+      <div class="text-config" v-if="activeTab === 'text'">
+        <div>
+          <h1>Work page title</h1>
+          <input type="text">
+        </div>
+        <div>
+          <h1>Work page description</h1>
+          <input type="text">
+        </div>
+        <div>
+          <h1>Shorts page title</h1>
+          <input type="text">
+        </div>
+        <div>
+          <h1>Shorts page description</h1>
+          <input type="text">
+        </div>
+
+        <div>
+          <h1>Contact page title</h1>
+          <input type="text">
+        </div>
+        <div>
+          <h1>Work page description</h1>
+          <input type="text">
         </div>
       </div>
       <button @click="createContent">Create new entry</button>

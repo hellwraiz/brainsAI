@@ -34,19 +34,11 @@ onMounted(async () => {
 
 <template>
     <div class="container pb-[150px] desktop:pb-0 page-transition" :class="{ 'page-enter-from': isEntering }" >
-        <h1>CREATIVITY WITHOUT BORDERS. CONTENT THAT CAPTIVATES, INSPIRES, AND REFUSES TO BE IGNORED.</h1>
+        <h1>{{ content.text['about main title'] }}</h1>
         <div>
-            <p style="flex: 2;">
-                <strong>Welcome to Mozgi AI </strong>- the creative playground where ideas have no limits. We produce commercials, reels, music videos, animated shorts, and films powered by AI and human ingenuity. Our collective of bold minds is driven by one mission: to make content that captivates, inspires, and leaves a mark.
-            </p>
-            <div style="flex: 1;">With us, you get:<br>
-                <ul>
-                    <li>Any format, any platform</li>
-                    <li>Speed that matches your ambition</li>
-                    <li>Freedom from traditional barriers</li>
-                </ul>
-            </div>
-            <p style="flex: 1;"><strong>Mozgi AI:</strong> Turning imagination into impact.</p>
+            <p style="flex: 1;"><strong>{{ content.text['about left title']}}</strong> {{ content.text['about left desc'] }}</p>
+            <p style="flex: 1;"><strong>{{ content.text['about middle title']}}</strong> {{ content.text['about middle desc'] }}</p>
+            <p style="flex: 1;"><strong>{{ content.text['about right title']}}</strong> {{ content.text['about right desc'] }}</p>
             <button><p>CONTACT US</p><img src="/public/images/arrowRW.png" style="width: 30px;" alt=""></button>
         </div>
     </div>

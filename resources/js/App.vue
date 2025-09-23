@@ -6,7 +6,8 @@ const isHome = computed(() => route.path === '/');
 const content = reactive({
     videos: [],
     shorts: [],
-    images: []
+    images: [],
+    text: []
 });
 const ACTIVATETHEBURGER = ref(false)
 
@@ -18,6 +19,13 @@ async function fetchVideos() {
         content.shorts = res.data;
         res = await axios.get(`/scrollImages`)
         content.images = res.data;
+        res = await axios.get(`/texts`)
+        console.log(res);
+        const textMap = {};
+        res.data.forEach(item => {
+            textMap[item.type] = item.content;
+        });
+        content.text = textMap;
     } catch (e) {
         console.error(`Failed to load videos`, e)
     }

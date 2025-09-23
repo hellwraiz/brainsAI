@@ -1,8 +1,9 @@
 <script setup>
 
-import { ref, reactive, watch, onMounted, nextTick } from 'vue'
+import { ref, reactive, watch, onMounted, nextTick, inject } from 'vue'
 import axios from 'axios'
 
+const content = inject('content');
 const form = reactive({
   name: '',
   email: '',
@@ -140,7 +141,7 @@ onMounted( async () => {
 
 <template>
   <div class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
-    <h1>TALK TO THE BRAINS BEHIND MOZGI. GOT A WILD IDEA? WE’VE GOT WILDER SOLUTIONS.</h1>
+    <h1>{{ content.text['contact title'] }}</h1>
     <div class="flex flex-col desktop:flex-row gap-[20px] desktop:gap-5">
       <!-- Social Media Icons -->
       <div class="flex gap-[18px]">
@@ -253,6 +254,7 @@ onMounted( async () => {
   font-weight: 900;
   margin: 36px 0 30px;
   width: 65%;
+  text-transform: uppercase;
 }
 
 .container > div {

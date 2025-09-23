@@ -26,7 +26,8 @@ onMounted( async () => {
 
 <template>
     <div v-if="!selectedVideo" class="container page-transition" :class="{ 'page-enter-from': isEntering }" >
-        <h1>THE PROOF IS IN THE PIXELS. A PORTFOLIO OF AI-POWERED VISIONS MADE REAL.</h1> 
+        <h1>{{ content.text['work title'] }}</h1> 
+        <p>{{ content.text['work desc'] }}</p>
         <div class="videoGrid">
             <div class="relative" @click="selectedVideo = video" :class="index % 2 === 1 ? 'shifted' : ''" v-for="(video, index) in videos" :key="index">
                 <img :src="video.img_url" class="w-full desktop:w-[704px] aspect-16/9 object-cover"></img>
@@ -108,11 +109,15 @@ span {
 }
 
 .container > h1 {
-    font-size: 2.4em;
+    font-size: 34px;
     font-weight: 900;
-    margin: 50px 0 50px;
-    width: 60%;
+    margin: 36px 0 30px;
+    width: 65%;
     line-height: 1em;
+    text-transform: uppercase;
+}
+.container > p {
+    margin-bottom: 70px;
 }
 
 .container > a {
