@@ -20,7 +20,6 @@ async function fetchVideos() {
         res = await axios.get(`/scrollImages`)
         content.images = res.data;
         res = await axios.get(`/texts`)
-        console.log(res);
         const textMap = {};
         res.data.forEach(item => {
             textMap[item.type] = item.content;

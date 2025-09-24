@@ -65,10 +65,17 @@ Route::post('/submit-form', function (Request $request) {
 
 
 Route::put('/texts/{text}', function (Request $request, Text $text) {
+
+    
+    // Get the raw JSON and decode it manually to preserve whitespace
+    $rawData = json_decode($request->getContent(), true);
     
     $validated = $request->validate([
         'content' => 'required|string',
     ]);
+
+    // Override the trimmed content with the raw version
+    $validated['content'] = $rawData['content'];
     
     $text->update($validated);
     

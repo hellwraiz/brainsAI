@@ -36,9 +36,9 @@ onMounted(async () => {
     <div class="container pb-[150px] desktop:pb-0 page-transition" :class="{ 'page-enter-from': isEntering }" >
         <h1>{{ content.text['about main title'] }}</h1>
         <div>
-            <p style="flex: 1;"><strong>{{ content.text['about left title']}}</strong> {{ content.text['about left desc'] }}</p>
-            <p style="flex: 1;"><strong>{{ content.text['about middle title']}}</strong> {{ content.text['about middle desc'] }}</p>
-            <p style="flex: 1;"><strong>{{ content.text['about right title']}}</strong> {{ content.text['about right desc'] }}</p>
+            <p style="flex: 1; white-space: pre-wrap;"><strong>{{ content.text['about left title']}}</strong> {{ content.text['about left desc'] }}</p>
+            <p style="flex: 1; white-space: pre-wrap;"><strong>{{ content.text['about middle title']}}</strong> {{ content.text['about middle desc'] }}</p>
+            <p style="flex: 1; white-space: pre-wrap;"><strong>{{ content.text['about right title']}}</strong> {{ content.text['about right desc'] }}</p>
             <button><p>CONTACT US</p><img src="/public/images/arrowRW.png" style="width: 30px;" alt=""></button>
         </div>
     </div>
@@ -67,7 +67,6 @@ onMounted(async () => {
 
 .container > div {
     display: flex;
-    width: 80%;
     padding-top: 20px;
     gap: 20px;
 

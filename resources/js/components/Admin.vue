@@ -1,7 +1,7 @@
 
 
 <script setup>
-import { ref, onMounted, inject, computed, reactive, watch } from 'vue'
+import { ref, onMounted, inject, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -35,6 +35,10 @@ const editFormImg = reactive({
   order: 0,
   file: null
 })
+const editText = reactive({})
+watch(() => content.text, (newText) => {
+  Object.entries(newText).forEach(entry => editText[entry[0]] = entry[1])
+}, { immediate: true })
 
 const tabs = [
   { id: 'videos', label: 'Videos' },
@@ -55,6 +59,15 @@ function fetchVideos() {
 function fetchImages() {
   axios.get('/scrollImages').then(response => {
     content.images = response.data
+  })
+}
+function fetchText() {
+  axios.get('/texts').then(response => {
+    const textMap = {};
+    response.data.forEach(item => {
+        textMap[item.type] = item.content;
+    });
+    content.text = textMap
   })
 }
 
@@ -205,8 +218,6 @@ const updateVideo = async () => {
     formData.append('isVideo', editFormVid.isVideo)
     formData.append('isLocal', editFormVid.isLocal)
     if (uploadingFile.value && editFormVid.file) {
-      console.log(editFormVid.file)
-      console.log(editFormVid.img)
       formData.append('video_file', editFormVid.file)
       formData.append('image_file', editFormVid.img)
     } else if (!uploadingFile.value && editFormVid.file_url) {
@@ -267,6 +278,20 @@ const updateImage = async () => {
     }
     closeModal()
     fetchImages()
+  } catch (error) {
+    console.error('Update failed:', error)
+  }
+}
+
+const updateText = async () => {
+  try {
+    for (let entry of Object.entries(editText)) {
+      if (entry[1] != content.text[entry[0]]) {
+        await axios.put(`/texts/${entry[0]}`, { content: entry[1] } )
+      }
+    }
+
+    fetchText()
   } catch (error) {
     console.error('Update failed:', error)
   }
@@ -359,34 +384,66 @@ const embedUrl = inject('embedUrl')
           </div>
         </div>
       </div>
+      <button v-if="activeTab != 'text'" @click="createContent">Create new entry</button>
       <div class="text-config" v-if="activeTab === 'text'">
         <div>
-          <h1>Work page title</h1>
-          <input type="text">
+          <h2>Work page title</h2>
+          <input v-model="editText['work title']" type="text"/>
         </div>
         <div>
-          <h1>Work page description</h1>
-          <input type="text">
+          <h2>Work page description</h2>
+          <textarea v-model="editText['work desc']"/>
         </div>
         <div>
-          <h1>Shorts page title</h1>
-          <input type="text">
+          <h2>Shorts page title</h2>
+          <input v-model="editText['shorts title']" type="text"/>
         </div>
         <div>
-          <h1>Shorts page description</h1>
-          <input type="text">
-        </div>
-
-        <div>
-          <h1>Contact page title</h1>
-          <input type="text">
+          <h2>Shorts page description</h2>
+          <textarea v-model="editText['shorts desc']" />
         </div>
         <div>
-          <h1>Work page description</h1>
-          <input type="text">
+          <h2>About main title</h2>
+          <input v-model="editText['about main title']" type="text"/>
+        </div>
+        <div class="flex flex-row gap-[25px]">
+          <div style="flex: 1;">
+            <div>
+              <h2>About left title</h2>
+              <input v-model="editText['about left title']"/>
+            </div>
+            <div>
+              <h2>About left description</h2>
+              <textarea v-model="editText['about left desc']"/>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div>
+              <h2>About middle title</h2>
+              <input v-model="editText['about middle title']"/>
+            </div>
+            <div>
+              <h2>About middle description</h2>
+              <textarea v-model="editText['about middle desc']"/>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div>
+              <h2>About right title</h2>
+              <input v-model="editText['about right title']"/>
+            </div>
+            <div>
+              <h2>About right description</h2>
+              <textarea v-model="editText['about right desc']"/>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2>Contact page title</h2>
+          <input v-model="editText['contact title']" type="text"/>
         </div>
       </div>
-      <button @click="createContent">Create new entry</button>
+      <button v-if="activeTab == 'text'" @click="updateText">Update text</button>
     </main>
   </div>
 
@@ -503,6 +560,11 @@ h1 {
   margin: 30px 0;
 }
 
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
 .admin-content {
   background: white;
   padding: 20px;
@@ -518,8 +580,13 @@ h1 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+.admin-content > button:hover {
+  background-color: #1c791f;
 }
 
+.text-config,
 .video-list {
   display: flex;
   flex-direction: column;
@@ -530,6 +597,19 @@ h1 {
   grid-template-columns: repeat(6, 1fr);
   justify-content: center;
   gap: 20px
+}
+.text-config > div {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+.text-config input,
+.text-config textarea {
+  background-color: #d0d0d0;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid black;
+  width: 100%;
 }
 
 .content-item {
